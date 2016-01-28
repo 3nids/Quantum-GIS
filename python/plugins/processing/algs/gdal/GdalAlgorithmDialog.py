@@ -25,12 +25,13 @@ __copyright__ = '(C) 2015, Victor Olaya'
 
 __revision__ = '$Format:%H$'
 
-
+from qgis.core import *
 from PyQt4.QtGui import *
 from processing.gui.AlgorithmDialog import AlgorithmDialog
 from processing.gui.AlgorithmDialogBase import AlgorithmDialogBase
 from processing.gui.ParametersPanel import ParametersPanel
 from processing.gui.MultipleInputPanel import MultipleInputPanel
+from processing.gui.NumberInputPanel import NumberInputPanel
 
 
 class GdalAlgorithmDialog(AlgorithmDialog):
@@ -54,6 +55,9 @@ class GdalAlgorithmDialog(AlgorithmDialog):
         self.tabWidget.setCornerWidget(cornerWidget)
 
         self.mainWidget.parametersHaveChanged()
+
+        QgsMapLayerRegistry.instance().layerWasAdded.connect(self.mainWidget.layerAdded)
+        QgsMapLayerRegistry.instance().layersWillBeRemoved.connect(self.mainWidget.layersWillBeRemoved)
 
 
 class GdalParametersPanel(ParametersPanel):
@@ -87,6 +91,8 @@ class GdalParametersPanel(ParametersPanel):
                 w.stateChanged.connect(self.parametersHaveChanged)
             elif isinstance(w, MultipleInputPanel):
                 w.selectionChanged.connect(self.parametersHaveChanged)
+            elif isinstance(w, NumberInputPanel):
+                w.hasChanged.connect(self.parametersHaveChanged)
 
     def parametersHaveChanged(self):
         try:

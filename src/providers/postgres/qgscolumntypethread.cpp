@@ -16,6 +16,7 @@ email                : jef at norbit dot de
  ***************************************************************************/
 
 #include "qgscolumntypethread.h"
+#include "qgspostgresconnpool.h"
 #include "qgslogger.h"
 
 #include <QMetaType>
@@ -44,7 +45,7 @@ void QgsGeomColumnTypeThread::stop()
 void QgsGeomColumnTypeThread::run()
 {
   QgsDataSourceURI uri = QgsPostgresConn::connUri( mName );
-  mConn = QgsPostgresConn::connectDb( uri.connectionInfo( false ), true );
+  mConn = QgsPostgresConnPool::instance()->acquireConnection( uri.connectionInfo( false ) );
   if ( !mConn )
   {
     QgsDebugMsg( "Connection failed - " + uri.connectionInfo( false ) );
@@ -63,7 +64,7 @@ void QgsGeomColumnTypeThread::run()
                                 mAllowGeometrylessTables ) ||
        layerProperties.isEmpty() )
   {
-    mConn->unref();
+    QgsPostgresConnPool::instance()->releaseConnection( mConn );
     mConn = nullptr;
     return;
   }
@@ -100,6 +101,7 @@ void QgsGeomColumnTypeThread::run()
     {
       layerProperty.types.clear();
       layerProperty.srids.clear();
+      break;
     }
 
     // Now tell the layer list dialog box...
@@ -107,8 +109,8 @@ void QgsGeomColumnTypeThread::run()
   }
 
   emit progress( 0, 0 );
-  emit progressMessage( tr( "Table retrieval finished." ) );
+  emit progressMessage( mStopped ? tr( "Table retrieval stopped." ) : tr( "Table retrieval finished." ) );
 
-  mConn->unref();
+  QgsPostgresConnPool::instance()->releaseConnection( mConn );
   mConn = nullptr;
 }

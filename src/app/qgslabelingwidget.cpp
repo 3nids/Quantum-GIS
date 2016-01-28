@@ -14,11 +14,12 @@
  ***************************************************************************/
 #include "qgslabelingwidget.h"
 
+#include "qgisapp.h"
 #include "qgslabelengineconfigdialog.h"
 #include "qgslabelinggui.h"
 #include "qgsrulebasedlabelingwidget.h"
 #include "qgsvectorlayerlabeling.h"
-#include "qgisapp.h"
+
 
 QgsLabelingWidget::QgsLabelingWidget( QgsVectorLayer* layer, QgsMapCanvas* canvas, QWidget* parent )
     : QWidget( parent )
@@ -105,7 +106,9 @@ void QgsLabelingWidget::labelModeChanged( int index )
   // in general case we need to recreate the widget
 
   if ( mWidget )
+  {
     mStackedWidget->removeWidget( mWidget );
+  }
 
   delete mWidget;
   mWidget = nullptr;

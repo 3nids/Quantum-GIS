@@ -1981,10 +1981,10 @@ void QgisApp::createToolBars()
   mDigitizeToolBar->insertWidget( mActionMoveFeature, tbAddCircularString );
 
   // Cad toolbar
-  mAdvancedDigitizeToolBar->insertAction( mActionUndo, mAdvancedDigitizingDockWidget->enableAction() );
+  mAdvancedDigitizeToolBar->insertAction( mActionEnableTracing, mAdvancedDigitizingDockWidget->enableAction() );
 
   mTracer = new QgsMapCanvasTracer( mMapCanvas, messageBar() );
-  mAdvancedDigitizeToolBar->insertAction( mActionUndo, mTracer->actionEnableTracing() );
+  mTracer->setActionEnableTracing( mActionEnableTracing );
 }
 
 void QgisApp::createStatusBar()
@@ -3257,16 +3257,10 @@ bool QgisApp::addVectorLayers( const QStringList &theLayerQStringList, const QSt
         //set friendly name for datasources with only one layer
         QStringList sublayers = layer->dataProvider()->subLayers();
         QStringList elements = sublayers.at( 0 ).split( ':' );
-        if ( layer->storageType() != "GeoJSON" )
-        {
-          while ( elements.size() > 4 )
-          {
-            elements[1] += ':' + elements[2];
-            elements.removeAt( 2 );
-          }
 
-          layer->setLayerName( elements.at( 1 ) );
-        }
+        Q_ASSERT( elements.size() >= 4 );
+        layer->setLayerName( QString( "%1 %2 %3" ).arg( layer->name(), elements.at( 1 ), elements.at( 3 ) ) );
+
         myList << layer;
       }
       else
@@ -3486,9 +3480,24 @@ void QgisApp::askUserForGDALSublayers( QgsRasterLayer *layer )
 
   if ( chooseSublayersDialog.exec() )
   {
+    // create more informative layer names, containing filename as well as sublayer name
+    QRegExp rx( "\"(.*)\"" );
+    QString uri, name;
+
     Q_FOREACH ( int i, chooseSublayersDialog.selectionIndexes() )
     {
-      QgsRasterLayer *rlayer = new QgsRasterLayer( sublayers[i], names[i] );
+      if ( rx.indexIn( sublayers[i] ) != -1 )
+      {
+        uri = rx.cap( 1 );
+        name = sublayers[i];
+        name.replace( uri, QFileInfo( uri ).completeBaseName() );
+      }
+      else
+      {
+        name = names[i];
+      }
+
+      QgsRasterLayer *rlayer = new QgsRasterLayer( sublayers[i], name );
       if ( rlayer && rlayer->isValid() )
       {
         addRasterLayer( rlayer );
@@ -7066,6 +7075,18 @@ bool QgisApp::toggleEditing( QgsMapLayer *layer, bool allowCancel )
 
   bool res = true;
 
+  QString connString = QgsDataSourceURI( vlayer->source() ).connectionInfo();
+  QString key = vlayer->providerType();
+
+  QMap< QPair< QString, QString>, QgsTransactionGroup*>::iterator tIt = mTransactionGroups.find( qMakePair( key, connString ) );
+  QgsTransactionGroup* tg = ( tIt != mTransactionGroups.end() ? tIt.value() : nullptr );
+
+  bool isModified = false;
+
+  // Assume changes if: a) the layer reports modifications or b) its transaction group was modified
+  if ( vlayer->isModified() || ( tg && tg->layers().contains( vlayer ) && tg->modified() ) )
+    isModified  = true;
+
   if ( !vlayer->isEditable() && !vlayer->isReadOnly() )
   {
     if ( !( vlayer->dataProvider()->capabilities() & QgsVectorDataProvider::EditingCapabilities ) )
@@ -7091,7 +7112,7 @@ bool QgisApp::toggleEditing( QgsMapLayer *layer, bool allowCancel )
       vlayer->triggerRepaint();
     }
   }
-  else if ( vlayer->isModified() )
+  else if ( isModified )
   {
     QMessageBox::StandardButtons buttons = QMessageBox::Save | QMessageBox::Discard;
     if ( allowCancel )
@@ -9727,7 +9748,7 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer* layer )
     mActionMergeFeatures->setEnabled( false );
     mActionMergeFeatureAttributes->setEnabled( false );
     mActionRotatePointSymbols->setEnabled( false );
-    mTracer->actionEnableTracing()->setEnabled( false );
+    mActionEnableTracing->setEnabled( false );
 
     mActionPinLabels->setEnabled( false );
     mActionShowHideLabels->setEnabled( false );
@@ -9848,8 +9869,8 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer* layer )
       mActionRotateFeature->setEnabled( isEditable && canChangeGeometry );
       mActionNodeTool->setEnabled( isEditable && canChangeGeometry );
 
-      mTracer->actionEnableTracing()->setEnabled( isEditable && canAddFeatures &&
-          ( vlayer->geometryType() == QGis::Line || vlayer->geometryType() == QGis::Polygon ) );
+      mActionEnableTracing->setEnabled( isEditable && canAddFeatures &&
+                                        ( vlayer->geometryType() == QGis::Line || vlayer->geometryType() == QGis::Polygon ) );
 
       if ( vlayer->geometryType() == QGis::Point )
       {

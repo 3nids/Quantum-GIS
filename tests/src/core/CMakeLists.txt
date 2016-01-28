@@ -33,6 +33,13 @@ INCLUDE_DIRECTORIES(SYSTEM
 ADD_DEFINITIONS(-DTEST_DATA_DIR="\\"${TEST_DATA_DIR}\\"")
 
 ADD_DEFINITIONS(-DINSTALL_PREFIX="\\"${CMAKE_INSTALL_PREFIX}\\"")
+
+# enable postgresql tests
+SET (ENABLE_PGTEST FALSE CACHE BOOL "Enable PostgreSQL provider tests")
+IF ( ENABLE_PGTEST )
+  ADD_DEFINITIONS( "-DENABLE_PGTEST" )
+ENDIF ()
+
 #############################################################
 # libraries
 
@@ -178,5 +185,6 @@ ADD_QGIS_TEST(vectorlayercachetest testqgsvectorlayercache.cpp )
 ADD_QGIS_TEST(vectorlayerjoinbuffer testqgsvectorlayerjoinbuffer.cpp )
 ADD_QGIS_TEST(vectorlayertest testqgsvectorlayer.cpp)
 ADD_QGIS_TEST(ziplayertest testziplayer.cpp)
+ADD_QGIS_TEST(adjacenttiles testqgsadjacenttiles.cpp)
 
 ADD_DEPENDENCIES(qgis_coordinatereferencesystemtest synccrsdb)

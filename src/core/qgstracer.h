@@ -47,6 +47,11 @@ class CORE_EXPORT QgsTracer : public QObject
     //! Set layers used for tracing
     void setLayers( const QList<QgsVectorLayer*>& layers );
 
+    //! Return true if reprojection to destination CRS is enabled
+    bool hasCrsTransformEnabled() const { return mReprojectionEnabled; }
+    //! Set whether to do reprojection to destination CRS
+    void setCrsTransformEnabled( bool enabled );
+
     //! Get CRS used for tracing
     QgsCoordinateReferenceSystem destinationCrs() const { return mCRS; }
     //! Set CRS used for tracing
@@ -106,12 +111,15 @@ class CORE_EXPORT QgsTracer : public QObject
     void onFeatureAdded( QgsFeatureId fid );
     void onFeatureDeleted( QgsFeatureId fid );
     void onGeometryChanged( QgsFeatureId fid, QgsGeometry& geom );
+    void onLayerDestroyed( QObject* obj );
 
   private:
     //! Graph data structure for path searching
     QgsTracerGraph* mGraph;
     //! Input layers for the graph building
     QList<QgsVectorLayer*> mLayers;
+    //! Whether to reproject layer features to specified destination CRS
+    bool mReprojectionEnabled;
     //! Destination CRS in which graph is built and tracing done
     QgsCoordinateReferenceSystem mCRS;
     //! Extent for graph building (empty extent means no limit)

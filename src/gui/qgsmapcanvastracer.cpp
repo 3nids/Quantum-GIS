@@ -17,6 +17,7 @@ QgsMapCanvasTracer::QgsMapCanvasTracer( QgsMapCanvas* canvas, QgsMessageBar* mes
     : mCanvas( canvas )
     , mMessageBar( messageBar )
     , mLastMessage( nullptr )
+    , mActionEnableTracing( nullptr )
 {
   sTracers.insert( canvas, this );
 
@@ -26,10 +27,6 @@ QgsMapCanvasTracer::QgsMapCanvasTracer( QgsMapCanvas* canvas, QgsMessageBar* mes
   connect( canvas, SIGNAL( extentsChanged() ), this, SLOT( invalidateGraph() ) );
   connect( canvas, SIGNAL( currentLayerChanged( QgsMapLayer* ) ), this, SLOT( onCurrentLayerChanged() ) );
   connect( canvas->snappingUtils(), SIGNAL( configChanged() ), this, SLOT( invalidateGraph() ) );
-
-  mActionEnableTracing = new QAction( QIcon( QgsApplication::getThemeIcon( "/mActionTracing.png" ) ), tr( "Enable Tracing" ), this );
-  mActionEnableTracing->setShortcut( Qt::Key_T );
-  mActionEnableTracing->setCheckable( true );
 
   // arbitrarily chosen limit that should allow for fairly fast initialization
   // of the underlying graph structure
@@ -48,6 +45,8 @@ QgsMapCanvasTracer* QgsMapCanvasTracer::tracerForCanvas( QgsMapCanvas* canvas )
 
 void QgsMapCanvasTracer::reportError( QgsTracer::PathError err, bool addingVertex )
 {
+  Q_UNUSED( addingVertex );
+
   if ( !mMessageBar )
     return;
 
@@ -60,17 +59,6 @@ void QgsMapCanvasTracer::reportError( QgsTracer::PathError err, bool addingVerte
   {
     case ErrTooManyFeatures:
       message = tr( "Disabled - there are too many features displayed. Try zooming in or disable some layers." );
-      break;
-    case ErrPoint1:
-      message = tr( "The start point needs to be snapped and in the visible map view" );
-      break;
-    case ErrPoint2:
-      if ( addingVertex )
-        message = tr( "The end point needs to be snapped" );
-      break;
-    case ErrNoPath:
-      if ( addingVertex )
-        message = tr( "Endpoints are not connected" );
       break;
     case ErrNone:
     default:
@@ -87,6 +75,7 @@ void QgsMapCanvasTracer::reportError( QgsTracer::PathError err, bool addingVerte
 
 void QgsMapCanvasTracer::configure()
 {
+  setCrsTransformEnabled( mCanvas->mapSettings().hasCrsTransformEnabled() );
   setDestinationCrs( mCanvas->mapSettings().destinationCrs() );
   setExtent( mCanvas->extent() );
 

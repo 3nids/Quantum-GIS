@@ -3113,8 +3113,12 @@ bool QgsExpression::isValid( const QString &text, const QgsExpressionContext *co
 {
   QgsExpression exp( text );
   exp.prepare( context );
-  errorMessage = exp.parserErrorString();
-  return !exp.hasParserError();
+  if ( exp.hasParserError() )
+    errorMessage = exp.parserErrorString();
+  else if ( exp.hasEvalError() )
+    errorMessage = exp.evalErrorString();
+
+  return !exp.hasParserError() && !exp.hasEvalError();
 }
 
 void QgsExpression::setScale( double scale ) { d->mScale = scale; }
