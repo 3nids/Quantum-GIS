@@ -19,6 +19,7 @@
 #include <QCheckBox>
 #include <QDialog>
 #include <QDialogButtonBox>
+#include <QEvent>
 #include <QGroupBox>
 #include <QLabel>
 #include <QLayout>
@@ -218,8 +219,9 @@ void QgsOptionsDialogBase::searchText( QString text )
   if ( !mOptStackedWidget )
     return;
 
-  mOptStackedWidget->show();
-  if ( mOptButtonBox )
+  if ( mOptStackedWidget->isHidden() )
+    mOptStackedWidget->show();
+  if ( mOptButtonBox && mOptButtonBox->isHidden() )
     mOptButtonBox->show();
   // hide all page if text has to be search, show them all otherwise
   for ( int r = 0; r < mOptListWidget->count(); ++r )
@@ -235,7 +237,7 @@ void QgsOptionsDialogBase::searchText( QString text )
     {
       QgsDebugMsg( QString( "Found %1 in %2 (tab: %3)" )
                    .arg( text )
-                   .arg( rsw.first.widgetName() )
+                   .arg( rsw.first.isValid() ? rsw.first.widget()->objectName() : "no widget" )
                    .arg( mOptListWidget->item( rsw.second )->text() ) );
       mOptListWidget->setRowHidden( rsw.second, false );
     }
@@ -368,7 +370,13 @@ void QgsOptionsDialogBase::optionsStackedWidget_WidgetRemoved( int indx )
   // will need to take item first, if widgets are set for item in future
   delete mOptListWidget->item( indx );
 
-  registerTextSearch();
+  QList<QPair< QgsSearchHighlightOptionWidget, int > >::iterator it = mRegisteredSearchWidgets.begin();
+  while (it != mRegisteredSearchWidgets.end()) {
+    if ((*it).second == indx)
+      it = mRegisteredSearchWidgets.erase(it);
+    else
+      ++it;
+  }
 }
 
 void QgsOptionsDialogBase::warnAboutMissingObjects()
@@ -383,47 +391,41 @@ void QgsOptionsDialogBase::warnAboutMissingObjects()
 
 
 QgsSearchHighlightOptionWidget::QgsSearchHighlightOptionWidget( QWidget* widget )
-    : mWidget( nullptr )
-    , mOriginalPalette( QPalette() )
-    , mColorRole( QPalette::Window )
-    , mColor( Qt::yellow )
+    : mWidget( widget )
+    , mOriginalStyleSheet( QString() )
+    , mStyleSheet( QString() )
+    , mValid( true )
+    , mChangedStyle( false )
     , mText( [=]( QWidget* ) {return QString();} )
 {
-  if ( !widget )
-  {
-    return;
-  }
-
   if ( qobject_cast<QLabel*>( widget ) )
   {
-    mColorRole = QPalette::Window;
+    mStyleSheet = "QLabel { background-color: yellow; color: blue;}";
     mText = [=]( QWidget * widget ) {return widget ? qobject_cast<QLabel*>( widget )->text() : QString(); };
   }
   else if ( qobject_cast<QCheckBox*>( widget ) )
   {
-    mColorRole = QPalette::Button;
+    mStyleSheet = "QCheckBox { background-color: yellow; color: blue;}";
     mText = [=]( QWidget * widget ) {return widget ? qobject_cast<QCheckBox*>( widget )->text() : QString(); };
+  }
+  else if ( qobject_cast<QAbstractButton*>( widget ) )
+  {
+    mStyleSheet = "QAbstractButton { background-color: yellow; color: blue;}";
+    mText = [=]( QWidget * widget ) {return widget ? qobject_cast<QAbstractButton*>( widget )->text() : QString(); };
   }
   else if ( qobject_cast<QGroupBox*>( widget ) )
   {
-    mColorRole = QPalette::WindowText;
+    mStyleSheet = "QGroupBox::title { background-color: yellow; color: blue;}";
     mText = [=]( QWidget * widget ) {return widget ? qobject_cast<QGroupBox*>( widget )->title() : QString(); };
   }
   else
   {
-    return;
+    mValid = false;
   }
-  mWidget = widget;
-  mOriginalPalette = mWidget->palette();
 }
 
 QgsSearchHighlightOptionWidget::~QgsSearchHighlightOptionWidget()
 {
-}
-
-bool QgsSearchHighlightOptionWidget::isValid()
-{
-  return mWidget;
 }
 
 bool QgsSearchHighlightOptionWidget::searchHighlight( QString searchText )
@@ -441,13 +443,16 @@ bool QgsSearchHighlightOptionWidget::searchHighlight( QString searchText )
     }
   }
 
-  if ( found )
+  if ( found && !mChangedStyle)
   {
-    QPalette pal( mOriginalPalette );
-    pal.setColor( mColorRole, mColor );
-
-    mWidget->setAutoFillBackground( true );
-    mWidget->setPalette( pal );
+    if ( !mWidget->isVisible() )
+    {
+      // show the widget to get initial stylesheet in case it's modified
+      mWidget->show();
+    }
+    mOriginalStyleSheet = mWidget->styleSheet();
+    mWidget->setStyleSheet( mOriginalStyleSheet + mStyleSheet );
+    mChangedStyle = true;
   }
 
   return found;
@@ -455,16 +460,9 @@ bool QgsSearchHighlightOptionWidget::searchHighlight( QString searchText )
 
 void QgsSearchHighlightOptionWidget::reset()
 {
-  if ( mWidget )
+  if ( mWidget && mChangedStyle )
   {
-    mWidget->setPalette( mOriginalPalette );
+    mWidget->setStyleSheet( mOriginalStyleSheet );
+    mChangedStyle = false;
   }
-}
-
-QString QgsSearchHighlightOptionWidget::widgetName()
-{
-  QString name;
-  if ( mWidget )
-    name = mWidget->objectName();
-  return name;
 }

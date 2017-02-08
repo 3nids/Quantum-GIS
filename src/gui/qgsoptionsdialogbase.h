@@ -45,19 +45,20 @@ class GUI_EXPORT QgsSearchHighlightOptionWidget
     explicit QgsSearchHighlightOptionWidget( QWidget* widget = 0 );
     ~QgsSearchHighlightOptionWidget();
 
-    bool isValid();
+    bool isValid() {return mValid;}
 
     bool searchHighlight( QString searchText );
 
     void reset();
 
-    QString widgetName();
+    QWidget* widget() {return mWidget;}
 
   private:
     QWidget* mWidget;
-    QPalette mOriginalPalette;
-    QPalette::ColorRole mColorRole;
-    QColor mColor;
+    QString mOriginalStyleSheet;
+    QString mStyleSheet;
+    bool mValid;
+    bool mChangedStyle;
     std::function < QString( QWidget* ) > mText;
 };
 
