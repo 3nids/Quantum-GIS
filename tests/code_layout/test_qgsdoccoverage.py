@@ -30,7 +30,7 @@ from acceptable_missing_doc import ACCEPTABLE_MISSING_DOCS, ACCEPTABLE_MISSING_A
 # $ export QGIS_PREFIX_PATH=build/output
 # $ python tests/src/python/test_qgsdoccoverage.py
 # copy the output to the file:
-# tests/src/python/acceptable_missing_doc.py
+# tests/code_layout/acceptable_missing_doc.py
 # in `ACCEPTABLE_MISSING_DOCS = { <past> }`.
 
 
