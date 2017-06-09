@@ -32,6 +32,8 @@
 #include "qgsauthcertutils.h"
 #include "qgis_gui.h"
 
+SIP_NO_FILE
+
 /** \ingroup gui
  * Widget for viewing detailed info on a certificate and its hierarchical trust chain
  */

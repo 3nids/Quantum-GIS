@@ -22,6 +22,8 @@
 #include <QSslError>
 #include "ui_qgsauthsslerrorsdialog.h"
 #include "qgis_gui.h"
+
+SIP_NO_FILE
 #include "qgis_sip.h"
 
 class QNetworkReply;

@@ -18,6 +18,12 @@
 
 
 /*
+ * if written, the SIP file will not be generated automatically
+ * or can be also defined directly in the file (to avoid including this)
+ */
+#define SIP_NO_FILE
+
+/*
  * the module will be included if the condition is met
  */
 #define SIP_IF_MODULE(condition)

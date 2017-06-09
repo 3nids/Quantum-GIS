@@ -23,6 +23,8 @@
 #include "ui_qgsauthmethodplugins.h"
 #include "qgis_gui.h"
 
+SIP_NO_FILE
+
 /** \ingroup gui
  * Dialog for viewing available authentication method plugins
  */

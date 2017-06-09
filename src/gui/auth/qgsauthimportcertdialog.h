@@ -24,6 +24,8 @@
 #include <QSslCertificate>
 #include "qgis_gui.h"
 
+SIP_NO_FILE
+
 class QPushButton;
 
 /** \ingroup gui

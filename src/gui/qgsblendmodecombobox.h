@@ -23,6 +23,8 @@
 #include <QPainter> // For QPainter::CompositionMode enum
 #include "qgis_gui.h"
 
+SIP_NO_FILE
+
 /** \ingroup gui
  * A combobox which lets the user select blend modes from a predefined list
  **/

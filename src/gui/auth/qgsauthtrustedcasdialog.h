@@ -26,6 +26,8 @@
 #include "qgsauthmanager.h"
 #include "qgis_gui.h"
 
+SIP_NO_FILE
+
 class QgsMessageBar;
 
 /** \ingroup gui

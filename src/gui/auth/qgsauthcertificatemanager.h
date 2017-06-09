@@ -24,6 +24,8 @@
 #include <QDialog>
 #include "qgis_gui.h"
 
+SIP_NO_FILE
+
 
 /** \ingroup gui
  * Wrapper widget to manage available certificate editors

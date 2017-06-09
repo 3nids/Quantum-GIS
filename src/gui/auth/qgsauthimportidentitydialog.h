@@ -28,6 +28,8 @@
 #include "qgsauthconfig.h"
 #include "qgis_gui.h"
 
+SIP_NO_FILE
+
 /** \ingroup gui
  * Widget for importing an identity certificate/key bundle into the authentication database
  */

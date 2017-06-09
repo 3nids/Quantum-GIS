@@ -22,6 +22,8 @@
 #include "qgis.h"
 #include "qgis_gui.h"
 
+SIP_NO_FILE
+
 /** \ingroup gui
  * Abstract base class for the edit widget of authentication method plugins
  */

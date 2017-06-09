@@ -22,6 +22,8 @@
 #include "qgsauthcertutils.h"
 #include "qgis_gui.h"
 
+SIP_NO_FILE
+
 /** \ingroup gui
  * Widget for editing the trust policy associated with a Certificate (Intermediate) Authority
  */

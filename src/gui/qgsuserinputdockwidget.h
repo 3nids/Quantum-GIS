@@ -23,6 +23,8 @@
 #include <QMap>
 #include "qgis_gui.h"
 
+SIP_NO_FILE
+
 class QFrame;
 class QBoxLayout;
 

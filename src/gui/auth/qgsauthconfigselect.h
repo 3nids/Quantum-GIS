@@ -24,6 +24,8 @@
 #include "qgsauthconfig.h"
 #include "qgis_gui.h"
 
+SIP_NO_FILE
+
 
 /** \ingroup gui
  * Selector widget for authentication configs

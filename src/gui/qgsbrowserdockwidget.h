@@ -25,6 +25,8 @@
 #include "qgsdockwidget.h"
 #include "qgsbrowserdockwidget_p.h"
 #include "qgis_gui.h"
+
+SIP_NO_FILE
 #include <QSortFilterProxyModel>
 
 class QgsBrowserModel;

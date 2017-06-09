@@ -25,6 +25,7 @@
 #include "qgseditorwidgetautoconf.h"
 #include "qgis_gui.h"
 
+
 class QgsMapLayer;
 class QDomNode;
 class QgsMapCanvas;
