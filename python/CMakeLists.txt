@@ -173,6 +173,7 @@ IF(UNIX AND NOT SIP_VERSION_NUM LESS 265984)
   ADD_DEFINITIONS(-Dprotected=public)
 ENDIF(UNIX AND NOT SIP_VERSION_NUM LESS 265984)
 
+GENERATE_SIP_INCLUDE_FILE(gui)
 GENERATE_SIP_PYTHON_MODULE_CODE(qgis._gui gui/gui.sip cpp_files)
 BUILD_SIP_PYTHON_MODULE(qgis._gui gui/gui.sip ${cpp_files} "" qgis_core qgis_gui)
 

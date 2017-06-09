@@ -324,6 +324,7 @@ SET(QGIS_GUI_SRCS
   qgsvertexmarker.cpp
   qgsfiledownloader.cpp
 )
+SET_PROPERTY(GLOBAL PROPERTY QGIS_GUI_SRCS ${QGIS_GUI_SRCS})
 
 SET(QGIS_GUI_MOC_HDRS
   qgisinterface.h

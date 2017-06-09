@@ -17,7 +17,7 @@
 #ifndef QGSEXCEPTION_H
 #define QGSEXCEPTION_H
 
-#define SIP_NO_CREATION
+#define SIP_NO_FILE
 
 #include <QString>
 

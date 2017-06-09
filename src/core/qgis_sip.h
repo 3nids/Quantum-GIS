@@ -16,6 +16,12 @@
 #ifndef QGIS_SIP_H
 #define QGIS_SIP_H
 
+
+/*
+ * the module will be included if the condition is met
+ */
+#define SIP_IF_MODULE(condition)
+
 /*
  * http://pyqt.sourceforge.net/Docs/sip4/annotations.html?highlight=keepreference#function-annotation-Transfer
  *
