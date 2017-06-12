@@ -142,6 +142,7 @@ void QgsMapToolMoveFeature::cadCanvasReleaseEvent( QgsMapMouseEvent *e )
       }
     }
 
+    e->snapPoint(QgsMapMouseEvent::SnapProjectConfig);
     mStartPointMapCoords = e->mapPoint();
     mRubberBand->setColor( QColor( 255, 0, 0, 65 ) );
     mRubberBand->setWidth( 2 );
@@ -158,6 +159,8 @@ void QgsMapToolMoveFeature::cadCanvasReleaseEvent( QgsMapMouseEvent *e )
       mRubberBand = nullptr;
       return;
     }
+    e->snapPoint(QgsMapMouseEvent::SnapProjectConfig);
+
 
     QgsPointXY startPointLayerCoords = toLayerCoordinates( ( QgsMapLayer * )vlayer, mStartPointMapCoords );
     QgsPointXY stopPointLayerCoords = toLayerCoordinates( ( QgsMapLayer * )vlayer, e->mapPoint() );
