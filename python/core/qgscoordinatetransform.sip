@@ -217,25 +217,6 @@ Default constructor, creates an invalid QgsCoordinateTransform.
 initialize is used to actually create the Transformer instance
 %End
 
-    bool readXml( const QDomNode &node );
-%Docstring
- Restores state from the given Dom node.
- \param node The node from which state will be restored
- :return: bool True on success, False on failure
-.. seealso:: writeXml()
- :rtype: bool
-%End
-
-    bool writeXml( QDomNode &node, QDomDocument &document ) const;
-%Docstring
- Stores state to the given Dom node in the given document
- \param node The node in which state will be restored
- \param document The document in which state will be stored
- :return: bool True on success, False on failure
-.. seealso:: readXml()
- :rtype: bool
-%End
-
 };
 
 
