@@ -231,7 +231,7 @@ void QgsBookmarks::zoomToBookmark()
        srid != QgisApp::instance()->mapCanvas()->mapSettings().destinationCrs().srsid() )
   {
     QgsCoordinateTransform ct( QgsCoordinateReferenceSystem::fromSrsId( srid ),
-                               QgisApp::instance()->mapCanvas()->mapSettings().destinationCrs() );
+                               QgisApp::instance()->mapCanvas()->mapSettings().destinationCrs(), QgsProject::instance() );
     rect = ct.transform( rect );
     if ( rect.isEmpty() )
     {

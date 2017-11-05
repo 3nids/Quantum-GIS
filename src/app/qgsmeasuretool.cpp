@@ -27,6 +27,7 @@
 #include "qgscursors.h"
 #include "qgsmessagelog.h"
 #include "qgssettings.h"
+#include "qgsproject.h"
 
 #include <QMessageBox>
 #include <QMouseEvent>
@@ -135,7 +136,7 @@ void QgsMeasureTool::updateSettings()
 
     mDialog->restart();
     mDone = lastDone;
-    QgsCoordinateTransform ct( mDestinationCrs, mCanvas->mapSettings().destinationCrs() );
+    QgsCoordinateTransform ct( mDestinationCrs, mCanvas->mapSettings().destinationCrs(), QgsProject::instance() );
 
     Q_FOREACH ( const QgsPointXY &previousPoint, points )
     {

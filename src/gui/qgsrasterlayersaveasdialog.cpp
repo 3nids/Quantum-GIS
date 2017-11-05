@@ -23,6 +23,7 @@
 #include "qgsrastertransparency.h"
 #include "qgsprojectionselectiondialog.h"
 #include "qgssettings.h"
+#include "qgsproject.h"
 
 #include <gdal.h>
 
@@ -369,7 +370,7 @@ void QgsRasterLayerSaveAsDialog::setResolution( double xRes, double yRes, const 
     // TODO: consider more precise resolution calculation
 
     QgsPointXY center = outputRectangle().center();
-    QgsCoordinateTransform ct( srcCrs, outputCrs() );
+    QgsCoordinateTransform ct( srcCrs, outputCrs(), QgsProject::instance() );
     QgsPointXY srsCenter = ct.transform( center, QgsCoordinateTransform::ReverseTransform );
 
     QgsRectangle srcExtent( srsCenter.x() - xRes / 2, srsCenter.y() - yRes / 2, srsCenter.x() + xRes / 2, srsCenter.y() + yRes / 2 );
