@@ -55,7 +55,7 @@ Default constructor, creates an invalid QgsCoordinateTransform.
 
  The ``context`` argument specifies the context under which the transform
  will be applied, and is used for calculating necessary datum transforms
- to utilise.
+ to utilize.
 
 .. versionadded:: 3.0
 %End
@@ -68,7 +68,7 @@ Default constructor, creates an invalid QgsCoordinateTransform.
  to ``destination`` coordinate reference system, when used with the
  given ``project``.
 
- No reference to ``project`` is stored or utilised outside of the constructor,
+ No reference to ``project`` is stored or utilized outside of the constructor,
  and it is used to retrieve the project's transform context only.
 
 .. versionadded:: 3.0
@@ -289,11 +289,6 @@ Default constructor, creates an invalid QgsCoordinateTransform.
 
 .. seealso:: destinationDatumTransform()
 .. seealso:: setSourceDatumTransform()
-%End
-
-    void initialize();
-%Docstring
-initialize is used to actually create the Transformer instance
 %End
 
     static void invalidateCache();
