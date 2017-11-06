@@ -74,6 +74,18 @@ Default constructor, creates an invalid QgsCoordinateTransform.
 .. versionadded:: 3.0
 %End
 
+    explicit QgsCoordinateTransform( const QgsCoordinateReferenceSystem &source,
+                                     const QgsCoordinateReferenceSystem &destination,
+                                     int sourceDatumTransform,
+                                     int destinationDatumTransform );
+%Docstring
+ Constructs a QgsCoordinateTransform to transform from the ``source``
+ to ``destination`` coordinate reference system, with the specified
+ datum transforms.
+
+.. versionadded:: 3.0
+%End
+
     QgsCoordinateTransform( const QgsCoordinateTransform &o );
 %Docstring
  Copy constructor
@@ -282,6 +294,14 @@ Default constructor, creates an invalid QgsCoordinateTransform.
     void initialize();
 %Docstring
 initialize is used to actually create the Transformer instance
+%End
+
+    static void invalidateCache();
+%Docstring
+ Clears the internal cache used to initialize QgsCoordinateTransform objects.
+ This should be called whenever the srs database has
+ been modified in order to ensure that outdated CRS transforms are not created.
+.. versionadded:: 3.0
 %End
 
 };
