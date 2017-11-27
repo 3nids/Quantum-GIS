@@ -999,7 +999,8 @@ QgsMapSettings QgsLayoutItemMap::mapSettings( const QgsRectangle &extent, QSizeF
   jobMapSettings.setFlag( QgsMapSettings::DrawSelection, false );
   jobMapSettings.setFlag( QgsMapSettings::UseAdvancedEffects, mLayout->context().flags() & QgsLayoutContext::FlagUseAdvancedEffects );
 
-  jobMapSettings.datumTransformStore().setDestinationCrs( renderCrs );
+  // todo datum nyall
+  //jobMapSettings.datumTransformStore().setDestinationCrs( renderCrs );
 
   jobMapSettings.setLabelingEngineSettings( mLayout->project()->labelingEngineSettings() );
 
@@ -1489,6 +1490,7 @@ QPointF QgsLayoutItemMap::layoutMapPosForItem( const QgsAnnotation *annotation )
   if ( annotationCrs != crs() )
   {
     //need to reproject
+    // todo datum nyall set context
     QgsCoordinateTransform t( annotationCrs, crs() );
     double z = 0.0;
     try
