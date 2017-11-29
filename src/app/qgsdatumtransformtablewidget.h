@@ -33,21 +33,23 @@
 class APP_EXPORT QgsDatumTransformTableModel : public QAbstractTableModel
 {
     Q_OBJECT
-  public:
+public:
 
     enum TableColumns
     {
-      SourceCrsColumn  = 0,
-      SourceTransformColumn,
-      DestinationCrsColumn,
-      DestinationTransformColumn,
+        SourceCrsColumn  = 0,
+        SourceTransformColumn,
+        DestinationCrsColumn,
+        DestinationTransformColumn,
     };
 
     QgsDatumTransformTableModel( QObject *parent = nullptr );
 
     void setTransformContext( QgsCoordinateTransformContext &context );
 
-    QgsCoordinateTransformContext transformContext() const {return mTransformContext;}
+    QgsCoordinateTransformContext transformContext() const {
+        return mTransformContext;
+    }
 
     /**
      * remove the transformation at given indexes
@@ -59,7 +61,7 @@ class APP_EXPORT QgsDatumTransformTableModel : public QAbstractTableModel
     QVariant data( const QModelIndex &index, int role ) const override;
     QVariant headerData( int section, Qt::Orientation orientation, int role ) const override;
 
-  private:
+private:
 
     QgsCoordinateTransformContext mTransformContext;
 };
@@ -73,9 +75,13 @@ public:
     explicit QgsDatumTransformTableWidget(QWidget *parent = 0);
     ~QgsDatumTransformTableWidget();
 
-    void setTransformContext( QgsCoordinateTransformContext &context ){ mModel->setTransformContext(context);}
+    void setTransformContext( QgsCoordinateTransformContext &context ) {
+        mModel->setTransformContext(context);
+    }
 
-    QgsCoordinateTransformContext transformContext() const {return mModel->transformContext();}
+    QgsCoordinateTransformContext transformContext() const {
+        return mModel->transformContext();
+    }
 
 public slots:
     //! add a new datum transform
