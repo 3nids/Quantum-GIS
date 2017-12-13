@@ -138,6 +138,7 @@ class ShellScintilla(QsciScintilla, code.InteractiveInterpreter):
             self.setAutoCompletionSource(self.AcsNone)
 
         cursorColor = self.settings.value("pythonConsole/cursorColor", QColor(Qt.black))
+        cursorColor = cursorColor.isValid() ? cursorColor : Qt.black
         self.setCaretForegroundColor(cursorColor)
 
         # Sets minimum height for input area based of font metric
