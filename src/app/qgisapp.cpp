@@ -6693,6 +6693,8 @@ bool QgisApp::loadComposersFromProject( const QDomDocument& doc )
     return false;
   }
 
+  mPrintComposers.clear();
+
   //restore each composer
   QDomNodeList composerNodes = doc.elementsByTagName( "Composer" );
   for ( int i = 0; i < composerNodes.size(); ++i )
