@@ -20,38 +20,56 @@
 #include "qgis.h"
 #include "qgis_gui.h"
 
-class QToolButton;
+class QPushButton;
 class QLineEdit;
 
 /**
  * \ingroup gui
  * \brief The QgsDateTimeEdit class is a QDateTimeEdit with the capability of setting/reading null date/times.
  */
+
 class GUI_EXPORT QgsDateTimeEdit : public QDateTimeEdit
 {
     Q_OBJECT
     Q_PROPERTY( bool allowNull READ allowNull WRITE setAllowNull )
 
   public:
-
     //! Constructor for QgsDateTimeEdit
     explicit QgsDateTimeEdit( QWidget *parent SIP_TRANSFERTHIS = nullptr );
-
-    //! Determines if the widget allows setting null date/time.
-    void setAllowNull( bool allowNull );
-    bool allowNull() const {return mAllowNull;}
-
-    /**
-     * \brief setDateTime set the date time in the widget and handles null date times.
-     * \note since QDateTimeEdit::setDateTime() is not virtual, setDateTime must be called for QgsDateTimeEdit.
-     */
-    void setDateTime( const QDateTime &dateTime );
 
     /**
      * \brief dateTime returns the date time which can eventually be a null date/time
      * \note since QDateTimeEdit::dateTime() is not virtual, dateTime must be called for QgsDateTimeEdit.
      */
     QDateTime dateTime() const;
+    QDate date() const;
+    QTime time() const;
+
+    //! Determines if the widget allows setting null date/time.
+    bool allowNull() const;
+    void setAllowNull( bool enable );
+
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
+
+  protected:
+    void showEvent( QShowEvent *event ) override;
+    void resizeEvent( QResizeEvent *event ) override;
+    void paintEvent( QPaintEvent *event ) override;
+    void keyPressEvent( QKeyEvent *event ) override;
+    void mousePressEvent( QMouseEvent *event ) override;
+    bool focusNextPrevChild( bool next ) override;
+    QValidator::State validate( QString &input, int &pos ) const override;
+
+  public slots:
+
+    /**
+     * \brief setDateTime set the date time in the widget and handles null date times.
+     * \note since QDateTimeEdit::setDateTime() is not virtual, setDateTime must be called for QgsDateTimeEdit.
+     */
+    void setDateTime( const QDateTime &dateTime );
+    void setDate( const QDate &date );
+    void setTime( const QTime &time );
 
     /**
      * Set the current date as NULL
@@ -65,28 +83,7 @@ class GUI_EXPORT QgsDateTimeEdit : public QDateTimeEdit
      */
     void setEmpty();
 
-  protected:
-    void resizeEvent( QResizeEvent *event ) override;
-
-    void mousePressEvent( QMouseEvent *event ) override;
-
-
-  private slots:
-    void changed( const QDateTime &dateTime );
-
-    void calendarSelectionChanged();
-
-
   private:
-    int spinButtonWidth() const;
-    int frameWidth() const;
-
-    bool mAllowNull = true;
-    bool mIsNull = true;
-    bool mIsEmpty = false;
-
-    QLineEdit *mNullLabel = nullptr;
-    QToolButton *mClearButton = nullptr;
 
     /**
      * Set the lowest Date that can be displayed with the Qt::ISODate format
@@ -103,6 +100,16 @@ class GUI_EXPORT QgsDateTimeEdit : public QDateTimeEdit
     {
       setMinimumDateTime( QDateTime::fromString( QStringLiteral( "0100-01-01" ), Qt::ISODate ) );
     }
+
+    void setNull( bool n );
+
+    Q_DISABLE_COPY( QgsDateTimeEdit )
+
+    bool mAllowNull = true;
+    bool mIsNull = true;
+    bool mIsEmpty = false;
+
+    QPushButton *mClearButton = nullptr;
 };
 
 #endif // QGSDATETIMEEDIT_H

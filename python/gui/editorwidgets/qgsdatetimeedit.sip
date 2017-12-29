@@ -9,6 +9,7 @@
 
 
 
+
 class QgsDateTimeEdit : QDateTimeEdit
 {
 %Docstring
@@ -19,25 +20,9 @@ class QgsDateTimeEdit : QDateTimeEdit
 #include "qgsdatetimeedit.h"
 %End
   public:
-
     explicit QgsDateTimeEdit( QWidget *parent /TransferThis/ = 0 );
 %Docstring
 Constructor for QgsDateTimeEdit
-%End
-
-    void setAllowNull( bool allowNull );
-%Docstring
-Determines if the widget allows setting null date/time.
-%End
-    bool allowNull() const;
-
-    void setDateTime( const QDateTime &dateTime );
-%Docstring
- setDateTime set the date time in the widget and handles null date times.
-
-.. note::
-
-   since QDateTimeEdit.setDateTime() is not virtual, setDateTime must be called for QgsDateTimeEdit.
 %End
 
     QDateTime dateTime() const;
@@ -48,6 +33,48 @@ Determines if the widget allows setting null date/time.
 
    since QDateTimeEdit.dateTime() is not virtual, dateTime must be called for QgsDateTimeEdit.
 %End
+    QDate date() const;
+    QTime time() const;
+
+    bool allowNull() const;
+%Docstring
+Determines if the widget allows setting null date/time.
+%End
+    void setAllowNull( bool enable );
+
+    virtual QSize sizeHint() const;
+
+    virtual QSize minimumSizeHint() const;
+
+
+  protected:
+    virtual void showEvent( QShowEvent *event );
+
+    virtual void resizeEvent( QResizeEvent *event );
+
+    virtual void paintEvent( QPaintEvent *event );
+
+    virtual void keyPressEvent( QKeyEvent *event );
+
+    virtual void mousePressEvent( QMouseEvent *event );
+
+    virtual bool focusNextPrevChild( bool next );
+
+    virtual QValidator::State validate( QString &input, int &pos ) const;
+
+
+  public slots:
+
+    void setDateTime( const QDateTime &dateTime );
+%Docstring
+ setDateTime set the date time in the widget and handles null date times.
+
+.. note::
+
+   since QDateTimeEdit.setDateTime() is not virtual, setDateTime must be called for QgsDateTimeEdit.
+%End
+    void setDate( const QDate &date );
+    void setTime( const QTime &time );
 
     virtual void clear();
 
@@ -65,14 +92,6 @@ Resets the widget to show no value (ie, an "unknown" state).
 
 .. versionadded:: 2.16
 %End
-
-  protected:
-    virtual void resizeEvent( QResizeEvent *event );
-
-
-    virtual void mousePressEvent( QMouseEvent *event );
-
-
 
 };
 
