@@ -1,0 +1,74 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/gui/qgsoptionsdialoghighlightwidgetsimpl.h                       *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+
+class QgsOptionsDialogHighlightInvalid : QgsOptionsDialogHighlightWidget
+{
+
+%TypeHeaderCode
+#include "qgsoptionsdialoghighlightwidgetsimpl.h"
+%End
+  public:
+    QgsOptionsDialogHighlightInvalid();
+};
+class QgsOptionsDialogHighlightLabel : QgsOptionsDialogHighlightWidget
+{
+
+%TypeHeaderCode
+#include "qgsoptionsdialoghighlightwidgetsimpl.h"
+%End
+  public:
+    QgsOptionsDialogHighlightLabel( QLabel *label );
+};
+class QgsOptionsDialogHighlightCheckBox : QgsOptionsDialogHighlightWidget
+{
+
+%TypeHeaderCode
+#include "qgsoptionsdialoghighlightwidgetsimpl.h"
+%End
+  public:
+    QgsOptionsDialogHighlightCheckBox( QCheckBox *checkBox );
+};
+class QgsOptionsDialogHighlightButton : QgsOptionsDialogHighlightWidget
+{
+
+%TypeHeaderCode
+#include "qgsoptionsdialoghighlightwidgetsimpl.h"
+%End
+  public:
+    QgsOptionsDialogHighlightButton( QAbstractButton *button );
+};
+class QgsOptionsDialogHighlightGroupBox : QgsOptionsDialogHighlightWidget
+{
+
+%TypeHeaderCode
+#include "qgsoptionsdialoghighlightwidgetsimpl.h"
+%End
+  public:
+    QgsOptionsDialogHighlightGroupBox( QGroupBox *groupBox );
+};
+class QgsOptionsDialogHighlightTree : QgsOptionsDialogHighlightWidget
+{
+
+%TypeHeaderCode
+#include "qgsoptionsdialoghighlightwidgetsimpl.h"
+%End
+  public:
+    QgsOptionsDialogHighlightTree( QTreeView *treeView );
+};
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/gui/qgsoptionsdialoghighlightwidgetsimpl.h                       *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
