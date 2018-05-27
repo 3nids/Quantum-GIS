@@ -46,7 +46,7 @@ def _qgssettings_enum_value(self, key, enumDefaultValue, section=None):
         raise ValueError("could not get the meta enum for given enum default value (type: {})".format(type(enumDefaultValue)))
 
     str_val = self.value(key, meta_enum.valueToKey(enumDefaultValue))
-    # need a new meta enum as QgsSettings.value is making a copy and leads to seg fault (proaby a PyQt issue)
+    # need a new meta enum as QgsSettings.value is making a copy and leads to seg fault (probably a PyQt issue)
     meta_enum_2 = metaEnumFromValue(enumDefaultValue)
     (enu_val, ok) = meta_enum_2.keyToValue(str_val)
 
@@ -89,7 +89,7 @@ def _qgssettings_flag_value(self, key, flagDefaultValue, section=None):
         raise ValueError("could not get the meta enum for given enum default value (type: {})".format(type(flagDefaultValue)))
 
     str_val = self.value(key, meta_enum.valueToKey(flagDefaultValue))
-    # need a new meta enum as QgsSettings.value is making a copy and leads to seg fault (proaby a PyQt issue)
+    # need a new meta enum as QgsSettings.value is making a copy and leads to seg fault (probably a PyQt issue)
     meta_enum_2 = metaEnumFromValue(flagDefaultValue)
     (flag_val, ok) = meta_enum_2.keysToValue(str_val)
 
