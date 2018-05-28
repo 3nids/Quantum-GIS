@@ -108,7 +108,8 @@ Returns QFileInfo object for the project's associated file.
    replacements that are aware of the fact that projects may be saved in other project storages.
 
 .. seealso:: :py:func:`fileName`
-\deprecated
+
+.. deprecated::
 
 .. versionadded:: 2.9
 %End

@@ -138,28 +138,28 @@ Sort this model by its display expression.
 %Docstring
 Does nothing except for calling beginRemoveRows()
 
-\deprecated
+.. deprecated::
 %End
 
  void onEndRemoveRows( const QModelIndex &parent, int first, int last );
 %Docstring
 Does nothing except for calling endRemoveRows()
 
-\deprecated
+.. deprecated::
 %End
 
  void onBeginInsertRows( const QModelIndex &parent, int first, int last );
 %Docstring
 Does nothing except for calling beginInsertRows()
 
-\deprecated
+.. deprecated::
 %End
 
  void onEndInsertRows( const QModelIndex &parent, int first, int last );
 %Docstring
 Does nothing except for calling endInsertRows()
 
-\deprecated
+.. deprecated::
 %End
 
 };

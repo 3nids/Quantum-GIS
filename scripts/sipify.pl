@@ -195,8 +195,8 @@ sub processDoxygenLine {
     if ( $line =~ m/\\since .*?([\d\.]+)/i ) {
         return "\n.. versionadded:: $1\n";
     }
-    if ( $line =~ m/\\deprecated (.*)/i ) {
-        return "\n.. deprecated:: $1\n";
+    if ( $line =~ m/\\deprecated(.*)/i ) {
+        return "\n.. deprecated::$1\n";
     }
 
     # create links in see also
