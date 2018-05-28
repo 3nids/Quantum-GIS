@@ -133,18 +133,18 @@ Returns the currently selected state for the widget's extent.
 %Docstring
 Sets the base part of ``title`` of the group box (will be appended with extent state)
 
-.. versionadded:: 2.12
-
 .. seealso:: :py:func:`titleBase`
+
+.. versionadded:: 2.12
 %End
 
     QString titleBase() const;
 %Docstring
 Returns the base part of title of the group box (will be appended with extent state).
 
-.. versionadded:: 2.12
-
 .. seealso:: :py:func:`setTitleBase`
+
+.. versionadded:: 2.12
 %End
 
     void setMapCanvas( QgsMapCanvas *canvas );
@@ -156,14 +156,13 @@ Sets the map canvas to enable dragging of extent on a canvas.
 .. versionadded:: 3.0
 %End
 
-    QSize ratio() const;
+    * \since QGIS 3.0
 %Docstring
 Returns the current fixed aspect ratio to be used when dragging extent onto the canvas.
 If the aspect ratio isn't fixed, the width and height will be set to zero.
-
-.. versionadded:: 3.0
 *
 %End
+    QSize ratio() const;
 
   public slots:
 
@@ -196,16 +195,15 @@ Sets the output extent by dragging on the canvas.
 .. versionadded:: 3.0
 %End
 
-    void setRatio( QSize ratio );
+    * \since QGIS 3.0
 %Docstring
 Sets a fixed aspect ratio to be used when dragging extent onto the canvas.
 To unset a fixed aspect ratio, set the width and height to zero.
 
 :param ratio: aspect ratio's width and height
-
-.. versionadded:: 3.0
 *
 %End
+    void setRatio( QSize ratio );
 
   signals:
 

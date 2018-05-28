@@ -106,8 +106,8 @@ class CORE_EXPORT QgsRaster
      * Supported are numerical types Byte, UInt16, Int16, UInt32, Int32, Float32, Float64.
      * \param value
      * \param dataType
-     * \since QGIS 2.16
      *  \note not available in Python bindings */
+    * \since QGIS 2.16
     static bool isRepresentableValue( double value, Qgis::DataType dataType ) SIP_SKIP;
 
     /**

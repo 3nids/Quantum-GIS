@@ -112,9 +112,9 @@ returns if the items can be checked or not
 %Docstring
 Returns the map layer corresponding to the specified ``index``.
 
-.. versionadded:: 3.0
-
 .. seealso:: :py:func:`indexFromLayer`
+
+.. versionadded:: 3.0
 %End
 
     void setAdditionalItems( const QStringList &items );

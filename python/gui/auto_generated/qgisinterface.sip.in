@@ -84,18 +84,18 @@ Returns a list of all map canvases open in the app.
 %Docstring
 Create a new map canvas with the specified unique ``name``.
 
-.. versionadded:: 3.0
-
 .. seealso:: :py:func:`closeMapCanvas`
+
+.. versionadded:: 3.0
 %End
 
     virtual void closeMapCanvas( const QString &name ) = 0;
 %Docstring
 Closes the additional map canvas with matching ``name``.
 
-.. versionadded:: 3.0
-
 .. seealso:: :py:func:`createNewMapCanvas`
+
+.. versionadded:: 3.0
 %End
 
     virtual QSize iconSize( bool dockedToolbar = false ) const = 0;
@@ -756,11 +756,9 @@ Register action to the shortcuts manager so its shortcut can be changed in GUI
 Unregister a previously registered action. (e.g. when plugin is going to be unloaded)
 %End
 
-    virtual void registerMapLayerConfigWidgetFactory( QgsMapLayerConfigWidgetFactory *factory ) = 0;
+    * \since QGIS 2.16
 %Docstring
 Register a new tab in the vector layer properties dialog.
-
-.. versionadded:: 2.16
 
 .. note::
 
@@ -769,21 +767,20 @@ Register a new tab in the vector layer properties dialog.
 
 .. seealso:: :py:func:`unregisterMapLayerPropertiesFactory`
 %End
+    virtual void registerMapLayerConfigWidgetFactory( QgsMapLayerConfigWidgetFactory *factory ) = 0;
 
     virtual void unregisterMapLayerConfigWidgetFactory( QgsMapLayerConfigWidgetFactory *factory ) = 0;
 %Docstring
 Unregister a previously registered tab in the vector layer properties dialog.
 
-.. versionadded:: 2.16
-
 .. seealso:: :py:func:`registerMapLayerPropertiesFactory`
+
+.. versionadded:: 2.16
 %End
 
-    virtual void registerOptionsWidgetFactory( QgsOptionsWidgetFactory *factory ) = 0;
+    * \since QGIS 3.0
 %Docstring
 Register a new tab in the options dialog.
-
-.. versionadded:: 3.0
 
 .. note::
 
@@ -792,21 +789,20 @@ Register a new tab in the options dialog.
 
 .. seealso:: :py:func:`unregisterOptionsWidgetFactory`
 %End
+    virtual void registerOptionsWidgetFactory( QgsOptionsWidgetFactory *factory ) = 0;
 
     virtual void unregisterOptionsWidgetFactory( QgsOptionsWidgetFactory *factory ) = 0;
 %Docstring
 Unregister a previously registered tab in the options dialog.
 
-.. versionadded:: 3.0
-
 .. seealso:: :py:func:`registerOptionsWidgetFactory`
+
+.. versionadded:: 3.0
 %End
 
-    virtual void registerCustomDropHandler( QgsCustomDropHandler *handler ) = 0;
+    * \since QGIS 3.0
 %Docstring
 Register a new custom drop handler.
-
-.. versionadded:: 3.0
 
 .. note::
 
@@ -815,21 +811,19 @@ Register a new custom drop handler.
 
 .. seealso:: :py:func:`unregisterCustomDropHandler`
 %End
+    virtual void registerCustomDropHandler( QgsCustomDropHandler *handler ) = 0;
 
-    virtual void unregisterCustomDropHandler( QgsCustomDropHandler *handler ) = 0;
+    * \since QGIS 3.0
 %Docstring
 Unregister a previously registered custom drop handler.
 
-.. versionadded:: 3.0
-
 .. seealso:: :py:func:`registerCustomDropHandler`
 %End
+    virtual void unregisterCustomDropHandler( QgsCustomDropHandler *handler ) = 0;
 
-    virtual void registerCustomLayoutDropHandler( QgsLayoutCustomDropHandler *handler ) = 0;
+    * \since QGIS 3.0
 %Docstring
 Register a new custom drop ``handler`` for layout windows.
-
-.. versionadded:: 3.0
 
 .. note::
 
@@ -838,15 +832,15 @@ Register a new custom drop ``handler`` for layout windows.
 
 .. seealso:: :py:func:`unregisterCustomLayoutDropHandler`
 %End
+    virtual void registerCustomLayoutDropHandler( QgsLayoutCustomDropHandler *handler ) = 0;
 
-    virtual void unregisterCustomLayoutDropHandler( QgsLayoutCustomDropHandler *handler ) = 0;
+    * \since QGIS 3.0
 %Docstring
 Unregister a previously registered custom drop ``handler`` for layout windows.
 
-.. versionadded:: 3.0
-
 .. seealso:: :py:func:`registerCustomLayoutDropHandler`
 %End
+    virtual void unregisterCustomLayoutDropHandler( QgsLayoutCustomDropHandler *handler ) = 0;
 
 
 
@@ -954,9 +948,9 @@ can change their tool button icons.
 %Docstring
 This signal is emitted when a new layout ``designer`` has been opened.
 
-.. versionadded:: 3.0
-
 .. seealso:: :py:func:`layoutDesignerWillBeClosed`
+
+.. versionadded:: 3.0
 %End
 
     void layoutDesignerWillBeClosed( QgsLayoutDesignerInterface *designer );
@@ -964,22 +958,22 @@ This signal is emitted when a new layout ``designer`` has been opened.
 This signal is emitted before a layout ``designer`` is going to be closed
 and deleted.
 
-.. versionadded:: 3.0
-
 .. seealso:: :py:func:`layoutDesignerClosed`
 
 .. seealso:: :py:func:`layoutDesignerOpened`
+
+.. versionadded:: 3.0
 %End
 
     void layoutDesignerClosed();
 %Docstring
 This signal is emitted after a layout designer window is closed.
 
-.. versionadded:: 3.0
-
 .. seealso:: :py:func:`layoutDesignerWillBeClosed`
 
 .. seealso:: :py:func:`layoutDesignerOpened`
+
+.. versionadded:: 3.0
 %End
 
     void initializationCompleted();

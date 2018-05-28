@@ -87,6 +87,18 @@ Raster namespace.
       SingleBandColorDataStyle
     };
 
+    * \since QGIS 2.16
+%Docstring
+Check if the specified value is representable in the given data type.
+Supported are numerical types Byte, UInt16, Int16, UInt32, Int32, Float32, Float64.
+
+:param value:
+:param dataType:
+
+.. note::
+
+   not available in Python bindings *
+%End
 
     static double representableValue( double value, Qgis::DataType dataType );
 %Docstring

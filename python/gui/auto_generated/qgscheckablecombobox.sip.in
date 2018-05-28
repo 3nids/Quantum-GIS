@@ -11,16 +11,25 @@
 
 
 
+* \since QGIS 3.0
+%Docstring
+QStandardItemModel subclass which makes all items checkable
+by default.
 
+.. note::
+
+   not available in Python bindings
+   *
+%End
+
+* \since QGIS 3.0
+%Docstring
+QComboBox subclass which allows selecting multiple items.
+*
+%End
 
 class QgsCheckableComboBox : QComboBox
 {
-%Docstring
-QComboBox subclass which allows selecting multiple items.
-
-.. versionadded:: 3.0
-*
-%End
 
 %TypeHeaderCode
 #include "qgscheckablecombobox.h"

@@ -47,14 +47,13 @@ Returns true if the user clicked 'Cancel All'
 
 };
 
-class QgsEncodingSelectionDialog: QDialog
-{
+* \since QGIS 3.0
 %Docstring
 A dialog which presents the user with a choice of file encodings.
-
-.. versionadded:: 3.0
 *
 %End
+class QgsEncodingSelectionDialog: QDialog
+{
 
 %TypeHeaderCode
 #include "qgsencodingfiledialog.h"

@@ -518,9 +518,9 @@ class CORE_EXPORT QgsAbstractGeometry
      * Adds a z-dimension to the geometry, initialized to a preset value.
      * \param zValue initial z-value for all nodes
      * \returns true on success
-     * \since QGIS 2.12
      * \see dropZValue()
      * \see addMValue()
+     * \since QGIS 2.12
      */
     virtual bool addZValue( double zValue = 0 ) = 0;
 
@@ -528,9 +528,9 @@ class CORE_EXPORT QgsAbstractGeometry
      * Adds a measure to the geometry, initialized to a preset value.
      * \param mValue initial m-value for all nodes
      * \returns true on success
-     * \since QGIS 2.12
      * \see dropMValue()
      * \see addZValue()
+     * \since QGIS 2.12
      */
     virtual bool addMValue( double mValue = 0 ) = 0;
 
@@ -649,8 +649,8 @@ class CORE_EXPORT QgsAbstractGeometry
      * Creates a new geometry with the same class and same WKB type as the original and transfers ownership.
      * To create it, the geometry is default constructed and then the WKB is changed.
      * \see clone()
-     * \since 3.0
      * \note Not available in Python bindings
+     * \since 3.0
      */
     virtual QgsAbstractGeometry *createEmptyWithSameType() const = 0 SIP_FACTORY;
 
