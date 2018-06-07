@@ -36,14 +36,14 @@ class APP_EXPORT QgsMapToolMoveFeature: public QgsMapToolAdvancedDigitizing
     QgsMapToolMoveFeature( QgsMapCanvas *canvas, MoveMode mode = Move );
     ~QgsMapToolMoveFeature() override;
 
-    void cadCanvasMoveEvent( QgsMapMouseEvent *e ) override;
+    void cadCanvasMoveEvent( QgsMapMouseEvent *event ) override;
 
-    void cadCanvasReleaseEvent( QgsMapMouseEvent *e ) override;
+    void cadCanvasReleaseEvent( QgsMapMouseEvent *event ) override;
 
     void deactivate() override;
 
     //! catch escape when active to action
-    void keyReleaseEvent( QKeyEvent *e ) override;
+    void keyReleaseEvent( QKeyEvent *event ) override;
 
   private:
     //! Start point of the move in map coordinates

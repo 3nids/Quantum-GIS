@@ -1036,12 +1036,14 @@ void QgsVertexTool::showVertexEditor()  //#spellok
     return;
 
   mSelectedFeature.reset( new QgsSelectedFeature( m.featureId(), m.layer(), mCanvas ) );
+
   if ( !mVertexEditor )
   {
     mVertexEditor.reset( new QgsVertexEditor( m.layer(), mSelectedFeature.get(), mCanvas ) );
     QgisApp::instance()->addDockWidget( Qt::LeftDockWidgetArea, mVertexEditor.get() );
     connect( mVertexEditor.get(), &QgsVertexEditor::deleteSelectedRequested, this, &QgsVertexTool::deleteVertexEditorSelection );
     connect( mVertexEditor.get(), &QgsVertexEditor::editorClosed, this, &QgsVertexTool::cleanupVertexEditor );
+    connect( mVertexEditor.get(), &QgsVertexEditor::selectionChangedByUser, this, [ = ]( const QList<Vertex> &vertices ) {this->setHighlightedVertices( vertices );} );
   }
   else
   {
@@ -1834,7 +1836,7 @@ void QgsVertexTool::setHighlightedVertices( const QList<Vertex> &listVertices, H
     mSelectedVertices.append( vertex );
   }
 
-  if ( mode == ModeSubtract )
+  if ( mode == ModeSubtract || mode == ModeReset )
   {
     // rebuild markers for remaining selection
     for ( const Vertex &vertex : qgis::as_const( mSelectedVertices ) )

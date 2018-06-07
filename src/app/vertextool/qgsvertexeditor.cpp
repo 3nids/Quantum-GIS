@@ -20,6 +20,7 @@
 #include "qgsmapcanvas.h"
 #include "qgsselectedfeature.h"
 #include "qgsvertexentry.h"
+#include "qgsvertextool.h"
 #include "qgsvectorlayer.h"
 #include "qgsgeometryutils.h"
 #include "qgsproject.h"
@@ -107,11 +108,21 @@ QVariant QgsVertexEditorModel::data( const QModelIndex &index, int role ) const
   {
     double r = 0;
     double minRadius = 0;
+    QFont font = mWidgetFont;
+    bool fontChanged = false;
+    if ( vertex->isSelected() )
+    {
+      font.setBold( true );
+      fontChanged = true;
+    }
     if ( calcR( index.row(), r, minRadius ) )
     {
-      QFont curvePointFont = mWidgetFont;
-      curvePointFont.setItalic( true );
-      return curvePointFont;
+      font.setItalic( true );
+      fontChanged = true;
+    }
+    if ( fontChanged )
+    {
+      return font;
     }
     else
     {
@@ -293,8 +304,6 @@ QgsVertexEditor::QgsVertexEditor(
 
   setWidget( mTableView );
 
-  connect( mTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &QgsVertexEditor::updateVertexSelection );
-
   updateEditor( layer, selectedFeature );
 }
 
@@ -311,7 +320,7 @@ void QgsVertexEditor::updateEditor( QgsVectorLayer *layer, QgsSelectedFeature *s
   // TODO We really should just update the model itself.
   mVertexModel = new QgsVertexEditorModel( mLayer, mSelectedFeature, mCanvas, this );
   mTableView->setModel( mVertexModel );
-
+  connect( mTableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &QgsVertexEditor::updateVertexSelection );
   connect( mSelectedFeature, &QgsSelectedFeature::selectionChanged, this, &QgsVertexEditor::updateTableSelection );
 }
 
@@ -349,12 +358,12 @@ void QgsVertexEditor::updateVertexSelection( const QItemSelection &selected, con
 
   mUpdatingVertexSelection = true;
 
-  mSelectedFeature->deselectAllVertices();
+  QList<int> verticesNrs;
   Q_FOREACH ( const QModelIndex &index, mTableView->selectionModel()->selectedRows() )
   {
-    int vertexIdx = index.row();
-    mSelectedFeature->selectVertex( vertexIdx );
+    verticesNrs.append( index.row() );
   }
+  mSelectedFeature->selectVertices( verticesNrs );
 
   //ensure that newly selected vertex is visible in canvas
   if ( !selected.indexes().isEmpty() )
@@ -362,6 +371,13 @@ void QgsVertexEditor::updateVertexSelection( const QItemSelection &selected, con
     int newRow = selected.indexes().first().row();
     zoomToVertex( newRow );
   }
+
+  QList<Vertex> vertices = QList<Vertex>();
+  for ( int i = 0; i < verticesNrs.count(); ++i )
+  {
+    vertices.append( Vertex( mLayer, mSelectedFeature->featureId(), verticesNrs[i] ) );
+  }
+  emit selectionChangedByUser( vertices );
 
   mUpdatingVertexSelection = false;
 }

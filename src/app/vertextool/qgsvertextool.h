@@ -81,6 +81,14 @@ class APP_EXPORT QgsVertexTool : public QgsMapToolAdvancedDigitizing
 
     QgsGeometry cachedGeometry( const QgsVectorLayer *layer, QgsFeatureId fid );
 
+  private:
+    enum HighlightMode
+    {
+      ModeReset, //!< Reset any current selection
+      ModeAdd, //!< Add to current selection
+      ModeSubtract, //!< Remove from current selection
+    };
+
   private slots:
     //! update geometry of our feature
     void onCachedGeometryChanged( QgsFeatureId fid, const QgsGeometry &geom );
@@ -98,6 +106,8 @@ class APP_EXPORT QgsVertexTool : public QgsMapToolAdvancedDigitizing
     void startRangeVertexSelection();
 
     void cleanEditor( QgsFeatureId id );
+
+    void setHighlightedVertices( const QList<Vertex> &listVertices, HighlightMode mode = ModeReset );
 
   private:
 
@@ -168,16 +178,6 @@ class APP_EXPORT QgsVertexTool : public QgsMapToolAdvancedDigitizing
     void addExtraVerticesToEdits( VertexEdits &edits, const QgsPointXY &mapPoint, QgsVectorLayer *dragLayer = nullptr, const QgsPointXY &layerPoint = QgsPointXY() );
 
     void applyEditsToLayers( VertexEdits &edits );
-
-
-    enum HighlightMode
-    {
-      ModeReset, //!< Reset any current selection
-      ModeAdd, //!< Add to current selection
-      ModeSubtract, //!< Remove from current selection
-    };
-
-    void setHighlightedVertices( const QList<Vertex> &listVertices, HighlightMode mode = ModeReset );
 
     void setHighlightedVerticesVisible( bool visible );
 

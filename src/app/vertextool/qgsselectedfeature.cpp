@@ -319,6 +319,15 @@ void QgsSelectedFeature::deselectAllVertices()
   emit selectionChanged();
 }
 
+void QgsSelectedFeature::selectVertices( QList<int> verticesNr )
+{
+  for ( int i = 0; i < mVertexMap.size(); i++ )
+  {
+    mVertexMap.at( i )->setSelected( verticesNr.contains( i ) );
+  }
+  emit selectionChanged();
+}
+
 void QgsSelectedFeature::invertVertexSelection( int vertexNr )
 {
   if ( vertexNr < 0 || vertexNr >= mVertexMap.size() )

@@ -29,6 +29,7 @@ class QgsRubberBand;
 class QgsSelectedFeature;
 class QgsVectorLayer;
 class QTableView;
+struct Vertex;
 
 class QgsVertexEditorModel : public QAbstractTableModel
 {
@@ -83,6 +84,7 @@ class QgsVertexEditor : public QgsDockWidget
     QgsVertexEditorModel *mVertexModel = nullptr;
 
   signals:
+    void selectionChangedByUser( const QList<Vertex> &vertices );
     void deleteSelectedRequested();
     void editorClosed();
 
