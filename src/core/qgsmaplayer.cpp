@@ -266,14 +266,12 @@ bool QgsMapLayer::readLayerXml( const QDomElement &layerElement,  QgsReadWriteCo
   savedValidation = QgsCoordinateReferenceSystem::customCrsValidation();
   QgsCoordinateReferenceSystem::setCustomCrsValidation( nullptr );
 
-  // read custom properties before passing reading further to a subclass, so that
-  // the subclass can also read custom properties
-  readCustomProperties( layerElement );
+  layerError = readLayerStyle( layerElement, context );
 
   QgsReadWriteContextCategoryPopper p = context.enterCategory( tr( "Layer" ), mne.text() );
 
   // now let the children grab what they need from the Dom node.
-  layerError = !readXml( layerElement, context );
+  layerError = !readXml( layerElement, context ) || layerError;
 
   // overwrite CRS with what we read from project file before the raster/vector
   // file reading functions changed it. They will if projections is specified in the file.
@@ -300,20 +298,6 @@ bool QgsMapLayer::readLayerXml( const QDomElement &layerElement,  QgsReadWriteCo
     {
       mID = mne.text();
     }
-  }
-
-  // use scale dependent visibility flag
-  setScaleBasedVisibility( layerElement.attribute( QStringLiteral( "hasScaleBasedVisibilityFlag" ) ).toInt() == 1 );
-  if ( layerElement.hasAttribute( QStringLiteral( "minimumScale" ) ) )
-  {
-    // older element, when scales were reversed
-    setMaximumScale( layerElement.attribute( QStringLiteral( "minimumScale" ) ).toDouble() );
-    setMinimumScale( layerElement.attribute( QStringLiteral( "maximumScale" ) ).toDouble() );
-  }
-  else
-  {
-    setMaximumScale( layerElement.attribute( QStringLiteral( "maxScale" ) ).toDouble() );
-    setMinimumScale( layerElement.attribute( QStringLiteral( "minScale" ) ).toDouble() );
   }
 
   setAutoRefreshInterval( layerElement.attribute( QStringLiteral( "autoRefreshTime" ), QStringLiteral( "0" ) ).toInt() );
@@ -399,6 +383,31 @@ bool QgsMapLayer::readLayerXml( const QDomElement &layerElement,  QgsReadWriteCo
   QDomElement metadataElem = layerElement.firstChildElement( QStringLiteral( "resourceMetadata" ) );
   mMetadata.readMetadataXml( metadataElem );
 
+  return true;
+} // bool QgsMapLayer::readLayerXML
+
+
+bool QgsMapLayer::readLayerStyle( const QDomElement &layerElement, QgsReadWriteContext &context )
+{
+  // read custom properties before passing reading further to a subclass, so that
+  // the subclass can also read custom properties
+  readCustomProperties( layerElement );
+
+  // use scale dependent visibility flag
+  setScaleBasedVisibility( layerElement.attribute( QStringLiteral( "hasScaleBasedVisibilityFlag" ) ).toInt() == 1 );
+  if ( layerElement.hasAttribute( QStringLiteral( "minimumScale" ) ) )
+  {
+    // older element, when scales were reversed
+    setMaximumScale( layerElement.attribute( QStringLiteral( "minimumScale" ) ).toDouble() );
+    setMinimumScale( layerElement.attribute( QStringLiteral( "maximumScale" ) ).toDouble() );
+  }
+  else
+  {
+    setMaximumScale( layerElement.attribute( QStringLiteral( "maxScale" ) ).toDouble() );
+    setMinimumScale( layerElement.attribute( QStringLiteral( "minScale" ) ).toDouble() );
+  }
+
+
   // flags
   QDomElement flagsElem = layerElement.firstChildElement( QStringLiteral( "flags" ) );
   QMetaEnum metaEnum = QMetaEnum::fromType<QgsMapLayer::LayerFlag>();
@@ -415,9 +424,8 @@ bool QgsMapLayer::readLayerXml( const QDomElement &layerElement,  QgsReadWriteCo
     else if ( !mFlags.testFlag( enumValue ) && flagValue )
       mFlags |= enumValue;
   }
+}
 
-  return true;
-} // bool QgsMapLayer::readLayerXML
 
 
 bool QgsMapLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &context )
@@ -433,11 +441,6 @@ bool QgsMapLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &cont
 
 bool QgsMapLayer::writeLayerXml( QDomElement &layerElement, QDomDocument &document, const QgsReadWriteContext &context ) const
 {
-  // use scale dependent visibility flag
-  layerElement.setAttribute( QStringLiteral( "hasScaleBasedVisibilityFlag" ), hasScaleBasedVisibility() ? 1 : 0 );
-  layerElement.setAttribute( QStringLiteral( "maxScale" ), QString::number( maximumScale() ) );
-  layerElement.setAttribute( QStringLiteral( "minScale" ), QString::number( minimumScale() ) );
-
   if ( !extent().isNull() )
   {
     layerElement.appendChild( QgsXmlUtils::writeRectangle( mExtent, document ) );
@@ -581,6 +584,20 @@ bool QgsMapLayer::writeLayerXml( QDomElement &layerElement, QDomDocument &docume
   mMetadata.writeMetadataXml( myMetadataElem, document );
   layerElement.appendChild( myMetadataElem );
 
+  QString errorMsg;
+  writeLayerStyle( layerElement, document );
+
+  // now append layer node to map layer node
+  return writeXml( layerElement, document, context );
+}
+
+void QgsMapLayer::writeLayerStyle( QDomElement &layerElement, QDomDocument &document ) const
+{
+  // use scale dependent visibility flag
+  layerElement.setAttribute( QStringLiteral( "hasScaleBasedVisibilityFlag" ), hasScaleBasedVisibility() ? 1 : 0 );
+  layerElement.setAttribute( QStringLiteral( "maxScale" ), QString::number( maximumScale() ) );
+  layerElement.setAttribute( QStringLiteral( "minScale" ), QString::number( minimumScale() ) );
+
   // flags
   // this code is saving automatically all the flags entries
   QDomElement layerFlagsElem = document.createElement( QStringLiteral( "flags" ) );
@@ -596,12 +613,8 @@ bool QgsMapLayer::writeLayerXml( QDomElement &layerElement, QDomDocument &docume
   }
   layerElement.appendChild( layerFlagsElem );
 
-  // now append layer node to map layer node
-
+  // custom properties
   writeCustomProperties( layerElement, document );
-
-  return writeXml( layerElement, document, context );
-
 }
 
 
@@ -1124,9 +1137,7 @@ void QgsMapLayer::exportNamedStyle( QDomDocument &doc, QString &errorMsg ) const
   myRootNode.setAttribute( QStringLiteral( "version" ), Qgis::QGIS_VERSION );
   myDocument.appendChild( myRootNode );
 
-  myRootNode.setAttribute( QStringLiteral( "hasScaleBasedVisibilityFlag" ), hasScaleBasedVisibility() ? 1 : 0 );
-  myRootNode.setAttribute( QStringLiteral( "maxScale" ), QString::number( maximumScale() ) );
-  myRootNode.setAttribute( QStringLiteral( "minScale" ), QString::number( minimumScale() ) );
+  writeLayerStyle( myRootNode, myDocument );
 
   if ( !writeSymbology( myRootNode, myDocument, errorMsg, QgsReadWriteContext() ) )  // TODO: support relative paths in QML?
   {

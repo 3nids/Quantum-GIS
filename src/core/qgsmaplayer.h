@@ -489,19 +489,19 @@ class CORE_EXPORT QgsMapLayer : public QObject
 
     /**
      * Sets state from Dom document
-       \param layerElement The Dom element corresponding to ``maplayer'' tag
-       \param context writing context (e.g. for conversion between relative and absolute paths)
-       \note
-
-       The Dom node corresponds to a Dom document project file XML element read
-       by QgsProject.
-
-       This, in turn, calls readXml(), which is over-rideable by sub-classes so
-       that they can read their own specific state from the given Dom node.
-
-       Invoked by QgsProject::read().
-
-       \returns true if successful
+     * \param layerElement The Dom element corresponding to ``maplayer'' tag
+     * \param context writing context (e.g. for conversion between relative and absolute paths)
+     * \note
+     *
+     * The Dom node corresponds to a Dom document project file XML element read
+     * by QgsProject.
+     *
+     * This, in turn, calls readXml() (and then readSymbology()), which is over-rideable
+     * by sub-classes so that they can read their own specific state from the given Dom node.
+     *
+     * Invoked by QgsProject::read().
+     *
+     * \returns true if successful
      */
     bool readLayerXml( const QDomElement &layerElement, QgsReadWriteContext &context );
 
@@ -515,14 +515,43 @@ class CORE_EXPORT QgsMapLayer : public QObject
      * The Dom node corresponds to a Dom document project file XML element to be
      * written by QgsProject.
      *
-     * This, in turn, calls writeXml(), which is over-rideable by sub-classes so
-     * that they can write their own specific state to the given Dom node.
+     * This, in turn, calls writeXml() (and then writeSymbology), which is over-rideable
+     * by sub-classes so that they can write their own specific state to the given Dom node.
      *
      * Invoked by QgsProject::write().
      *
      * \returns true if successful
      */
     bool writeLayerXml( QDomElement &layerElement, QDomDocument &document, const QgsReadWriteContext &context ) const;
+
+
+    /**
+     * Sets layer style from Dom document
+       \param layerElement The Dom element corresponding to ``maplayer'' tag
+       \param context writing context (e.g. for conversion between relative and absolute paths)
+       \note
+
+       The Dom node corresponds to a Dom document project file XML element read
+       by QgsProject.
+
+       This, in turn, calls writeSymbology(), which is over-rideable by sub-classes so
+       that they can read their own specific state from the given Dom node.
+
+       \returns true if successful
+     */
+    bool readLayerStyle( const QDomElement &layerElement, QgsReadWriteContext &context );
+
+
+    /**
+     * Stores the layer style in Dom node
+     * \param layerElement is a Dom element corresponding to ``maplayer'' tag
+     * \param document is a the dom document being written
+     * \note This calls writeSymbology() (but actually writes the style)
+     * which is over-rideable by sub-classes so that they can write their
+     * own specific state to the given Dom node.
+     * \returns true if successful
+     */
+    void writeLayerStyle( QDomElement &layerElement, QDomDocument &document ) const;
 
     /**
      * Resolve references to other layers (kept as layer IDs after reading XML) into layer objects.
@@ -820,23 +849,25 @@ class CORE_EXPORT QgsMapLayer : public QObject
     virtual bool readStyle( const QDomNode &node, QString &errorMessage, QgsReadWriteContext &context );
 
     /**
-     * Write the symbology for the layer into the docment provided.
+     * Write the style for the layer into the docment provided.
      *  \param node the node that will have the style element added to it.
      *  \param doc the document that will have the QDomNode added.
      *  \param errorMessage reference to string that will be updated with any error messages
      *  \param context writing context (used for transform from absolute to relative paths)
+     *  \note There is a confusion of terms with the GUI. This method actually writes what is called a style in the application.
      *  \returns true in case of success.
      */
     virtual bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context ) const = 0;
 
     /**
-     * Write just the style information for the layer into the document
+     * Write just the symbology information for the layer into the document
      *  \param node the node that will have the style element added to it.
      *  \param doc the document that will have the QDomNode added.
      *  \param errorMessage reference to string that will be updated with any error messages
      *  \param context writing context (used for transform from absolute to relative paths)
      *  \returns true in case of success.
      *  \note To be implemented in subclasses. Default implementation does nothing and returns false.
+     *  \note There is a confusion of terms with the GUI. This method actually writes what is known as the symbology in the application.
      *  \since QGIS 2.16
      */
     virtual bool writeStyle( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context ) const;
