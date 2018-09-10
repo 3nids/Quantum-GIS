@@ -43,6 +43,7 @@ only possible to read or write layer's current style.
       AttributeTable,
       Rendering,
       CustomProperties,
+      All
     };
     typedef QFlags<QgsMapLayerStyle::StyleCategory> StyleCategories;
 

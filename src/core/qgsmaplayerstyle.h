@@ -59,6 +59,8 @@ class CORE_EXPORT QgsMapLayerStyle
       AttributeTable     = 7 << 8,
       Rendering          = 1 << 9, //!< Scale visibility, simplify method
       CustomProperties   = 1 << 10,
+      All = LayerConfiguration | Symbology | Labels | Fields | Forms | Actions |
+            Tooltips | Diagrams | AttributeTable | Rendering | CustomProperties,
     };
     Q_ENUM( StyleCategory )
     Q_DECLARE_FLAGS( StyleCategories, StyleCategory )
