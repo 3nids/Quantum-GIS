@@ -542,18 +542,6 @@ class CORE_EXPORT QgsMapLayer : public QObject
      */
     bool readLayerStyle( const QDomElement &layerElement, QgsReadWriteContext &context );
 
-
-    /**
-     * Stores the layer style in Dom node
-     * \param layerElement is a Dom element corresponding to ``maplayer'' tag
-     * \param document is a the dom document being written
-     * \note This calls writeSymbology() (but actually writes the style)
-     * which is over-rideable by sub-classes so that they can write their
-     * own specific state to the given Dom node.
-     * \returns true if successful
-     */
-    void writeLayerStyle( QDomElement &layerElement, QDomDocument &document ) const;
-
     /**
      * Resolve references to other layers (kept as layer IDs after reading XML) into layer objects.
      * \since QGIS 3.0
@@ -766,7 +754,8 @@ class CORE_EXPORT QgsMapLayer : public QObject
      * \param errorMsg this QString will be initialized on error
      * during the execution of writeSymbology
      */
-    virtual void exportNamedStyle( QDomDocument &doc, QString &errorMsg SIP_OUT, QgsMapLayerStyle::StyleCategories categories = QgsMapLayerStyle::All ) const;
+    virtual void exportNamedStyle( QDomDocument &doc, QString &errorMsg SIP_OUT, QgsReadWriteContext &context,
+                                   QgsMapLayerStyle::StyleCategories categories = QgsMapLayerStyle::All ) const;
 
 
     /**
@@ -858,7 +847,8 @@ class CORE_EXPORT QgsMapLayer : public QObject
      *  \note There is a confusion of terms with the GUI. This method actually writes what is called a style in the application.
      *  \returns true in case of success.
      */
-    virtual bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context ) const = 0;
+    virtual bool writeSymbology( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context,
+                                 QgsMapLayerStyle::StyleCategories categories = QgsMapLayerStyle::All ) const = 0;
 
     /**
      * Write just the symbology information for the layer into the document
@@ -871,7 +861,8 @@ class CORE_EXPORT QgsMapLayer : public QObject
      *  \note There is a confusion of terms with the GUI. This method actually writes what is known as the symbology in the application.
      *  \since QGIS 2.16
      */
-    virtual bool writeStyle( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context ) const;
+    virtual bool writeStyle( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context,
+                             QgsMapLayerStyle::StyleCategories categories = QgsMapLayerStyle::All ) const;
 
     //! Returns pointer to layer's undo stack
     QUndoStack *undoStack();
@@ -1308,7 +1299,9 @@ class CORE_EXPORT QgsMapLayer : public QObject
      * Write style data common to all layer types
      * \since QGIS 3.0
      */
-    void writeCommonStyle( QDomElement &layerElement, QDomDocument &document, const QgsReadWriteContext &context ) const;
+    void writeCommonStyle( QDomElement &layerElement, QDomDocument &document,
+                           const QgsReadWriteContext &context,
+                           QgsMapLayerStyle::StyleCategories categories = QgsMapLayerStyle::All ) const;
 
     /**
      * Read style data common to all layer types

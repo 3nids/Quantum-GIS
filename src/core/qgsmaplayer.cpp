@@ -407,7 +407,6 @@ bool QgsMapLayer::readLayerStyle( const QDomElement &layerElement, QgsReadWriteC
     setMinimumScale( layerElement.attribute( QStringLiteral( "minScale" ) ).toDouble() );
   }
 
-
   // flags
   QDomElement flagsElem = layerElement.firstChildElement( QStringLiteral( "flags" ) );
   QMetaEnum metaEnum = QMetaEnum::fromType<QgsMapLayer::LayerFlag>();
@@ -585,36 +584,54 @@ bool QgsMapLayer::writeLayerXml( QDomElement &layerElement, QDomDocument &docume
   layerElement.appendChild( myMetadataElem );
 
   QString errorMsg;
-  writeLayerStyle( layerElement, document );
+  writeCommonStyle( layerElement, document, context );
 
   // now append layer node to map layer node
   return writeXml( layerElement, document, context );
 }
 
-void QgsMapLayer::writeLayerStyle( QDomElement &layerElement, QDomDocument &document ) const
+void QgsMapLayer::writeCommonStyle( QDomElement &layerElement, QDomDocument &document,
+                                    const QgsReadWriteContext &context, QgsMapLayerStyle::StyleCategories categories ) const
 {
-  // use scale dependent visibility flag
-  layerElement.setAttribute( QStringLiteral( "hasScaleBasedVisibilityFlag" ), hasScaleBasedVisibility() ? 1 : 0 );
-  layerElement.setAttribute( QStringLiteral( "maxScale" ), QString::number( maximumScale() ) );
-  layerElement.setAttribute( QStringLiteral( "minScale" ), QString::number( minimumScale() ) );
-
-  // flags
-  // this code is saving automatically all the flags entries
-  QDomElement layerFlagsElem = document.createElement( QStringLiteral( "flags" ) );
-  QMetaEnum metaEnum = QMetaEnum::fromType<QgsMapLayer::LayerFlag>();
-  for ( int idx = 0; idx < metaEnum.keyCount(); ++idx )
+  if ( categories.testFlag( QgsMapLayerStyle::Rendering ) )
   {
-    const char *enumKey = metaEnum.key( idx );
-    QgsMapLayer::LayerFlag enumValue = static_cast<QgsMapLayer::LayerFlag>( metaEnum.keyToValue( enumKey ) );
-    bool flagValue = mFlags.testFlag( enumValue );
-    QDomElement flagElem = document.createElement( enumKey );
-    flagElem.appendChild( document.createTextNode( QString::number( flagValue ) ) );
-    layerFlagsElem.appendChild( flagElem );
+    // use scale dependent visibility flag
+    layerElement.setAttribute( QStringLiteral( "hasScaleBasedVisibilityFlag" ), hasScaleBasedVisibility() ? 1 : 0 );
+    layerElement.setAttribute( QStringLiteral( "maxScale" ), QString::number( maximumScale() ) );
+    layerElement.setAttribute( QStringLiteral( "minScale" ), QString::number( minimumScale() ) );
   }
-  layerElement.appendChild( layerFlagsElem );
+
+  if ( m3DRenderer )
+  {
+    QDomElement renderer3DElem = document.createElement( QStringLiteral( "renderer-3d" ) );
+    renderer3DElem.setAttribute( QStringLiteral( "type" ), m3DRenderer->type() );
+    m3DRenderer->writeXml( renderer3DElem, context );
+    layerElement.appendChild( renderer3DElem );
+  }
+
+  if ( categories.testFlag( QgsMapLayerStyle::LayerConfiguration ) )
+  {
+    // flags
+    // this code is saving automatically all the flags entries
+    QDomElement layerFlagsElem = document.createElement( QStringLiteral( "flags" ) );
+    QMetaEnum metaEnum = QMetaEnum::fromType<QgsMapLayer::LayerFlag>();
+    for ( int idx = 0; idx < metaEnum.keyCount(); ++idx )
+    {
+      const char *enumKey = metaEnum.key( idx );
+      QgsMapLayer::LayerFlag enumValue = static_cast<QgsMapLayer::LayerFlag>( metaEnum.keyToValue( enumKey ) );
+      bool flagValue = mFlags.testFlag( enumValue );
+      QDomElement flagElem = document.createElement( enumKey );
+      flagElem.appendChild( document.createTextNode( QString::number( flagValue ) ) );
+      layerFlagsElem.appendChild( flagElem );
+    }
+    layerElement.appendChild( layerFlagsElem );
+  }
 
   // custom properties
-  writeCustomProperties( layerElement, document );
+  if ( categories.testFlag( QgsMapLayerStyle::CustomProperties ) )
+  {
+    writeCustomProperties( layerElement, document );
+  }
 }
 
 
@@ -1127,7 +1144,7 @@ void QgsMapLayer::exportNamedMetadata( QDomDocument &doc, QString &errorMsg ) co
   doc = myDocument;
 }
 
-void QgsMapLayer::exportNamedStyle( QDomDocument &doc, QString &errorMsg, QgsMapLayerStyle::StyleCategories categories ) const
+void QgsMapLayer::exportNamedStyle( QDomDocument &doc, QString &errorMsg, QgsReadWriteContext & contQgsMapLayerStyle::StyleCategories categories ) const
 {
   QDomImplementation DomImplementation;
   QDomDocumentType documentType = DomImplementation.createDocumentType( QStringLiteral( "qgis" ), QStringLiteral( "http://mrcc.com/qgis.dtd" ), QStringLiteral( "SYSTEM" ) );
@@ -1137,9 +1154,9 @@ void QgsMapLayer::exportNamedStyle( QDomDocument &doc, QString &errorMsg, QgsMap
   myRootNode.setAttribute( QStringLiteral( "version" ), Qgis::QGIS_VERSION );
   myDocument.appendChild( myRootNode );
 
-  writeLayerStyle( myRootNode, myDocument );
+  writeCommonStyle( myRootNode, myDocument, context, categories );
 
-  if ( !writeSymbology( myRootNode, myDocument, errorMsg, QgsReadWriteContext() ) )  // TODO: support relative paths in QML?
+  if ( !writeSymbology( myRootNode, myDocument, errorMsg, QgsReadWriteContext(), categories ) )  // TODO: support relative paths in QML?
   {
     errorMsg = QObject::tr( "Could not save symbology because:\n%1" ).arg( errorMsg );
     return;
@@ -1592,25 +1609,14 @@ bool QgsMapLayer::readStyle( const QDomNode &node, QString &errorMessage, QgsRea
   return false;
 }
 
-bool QgsMapLayer::writeStyle( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context ) const
+bool QgsMapLayer::writeStyle( QDomNode &node, QDomDocument &doc, QString &errorMessage,
+                              const QgsReadWriteContext &context, QgsMapLayerStyle::StyleCategories categories ) const
 {
   Q_UNUSED( node );
   Q_UNUSED( doc );
   Q_UNUSED( errorMessage );
   Q_UNUSED( context );
   return false;
-}
-
-
-void QgsMapLayer::writeCommonStyle( QDomElement &layerElement, QDomDocument &document, const QgsReadWriteContext &context ) const
-{
-  if ( m3DRenderer )
-  {
-    QDomElement renderer3DElem = document.createElement( QStringLiteral( "renderer-3d" ) );
-    renderer3DElem.setAttribute( QStringLiteral( "type" ), m3DRenderer->type() );
-    m3DRenderer->writeXml( renderer3DElem, context );
-    layerElement.appendChild( renderer3DElem );
-  }
 }
 
 void QgsMapLayer::readCommonStyle( const QDomElement &layerElement, const QgsReadWriteContext &context )
