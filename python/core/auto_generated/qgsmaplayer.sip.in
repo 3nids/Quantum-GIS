@@ -818,7 +818,7 @@ Import the properties of this layer from a QDomDocument
 .. versionadded:: 2.8
 %End
 
-    virtual void exportNamedStyle( QDomDocument &doc, QString &errorMsg /Out/ ) const;
+    virtual void exportNamedStyle( QDomDocument &doc, QString &errorMsg /Out/, QgsMapLayerStyle::StyleCategories categories = QgsMapLayerStyle::All ) const;
 %Docstring
 Export the properties of this layer as named style in a QDomDocument
 

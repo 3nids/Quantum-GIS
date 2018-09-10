@@ -35,6 +35,7 @@
 #include "qgsrendercontext.h"
 #include "qgsmaplayerdependency.h"
 #include "qgslayermetadata.h"
+#include "qgsmaplayerstyle.h"
 
 class QgsAbstract3DRenderer;
 class QgsDataProvider;
@@ -765,7 +766,7 @@ class CORE_EXPORT QgsMapLayer : public QObject
      * \param errorMsg this QString will be initialized on error
      * during the execution of writeSymbology
      */
-    virtual void exportNamedStyle( QDomDocument &doc, QString &errorMsg SIP_OUT ) const;
+    virtual void exportNamedStyle( QDomDocument &doc, QString &errorMsg SIP_OUT, QgsMapLayerStyle::StyleCategories categories = QgsMapLayerStyle::All ) const;
 
 
     /**

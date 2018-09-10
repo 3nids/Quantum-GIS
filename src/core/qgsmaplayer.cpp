@@ -1127,7 +1127,7 @@ void QgsMapLayer::exportNamedMetadata( QDomDocument &doc, QString &errorMsg ) co
   doc = myDocument;
 }
 
-void QgsMapLayer::exportNamedStyle( QDomDocument &doc, QString &errorMsg ) const
+void QgsMapLayer::exportNamedStyle( QDomDocument &doc, QString &errorMsg, QgsMapLayerStyle::StyleCategories categories ) const
 {
   QDomImplementation DomImplementation;
   QDomDocumentType documentType = DomImplementation.createDocumentType( QStringLiteral( "qgis" ), QStringLiteral( "http://mrcc.com/qgis.dtd" ), QStringLiteral( "SYSTEM" ) );
