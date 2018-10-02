@@ -83,6 +83,7 @@ void QgsGeometryValidationDock::setGeometryValidationModel( QgsGeometryValidatio
   mErrorListView->setModel( mGeometryValidationModel );
 
   connect( mErrorListView->selectionModel(), &QItemSelectionModel::currentChanged, this, &QgsGeometryValidationDock::onCurrentErrorChanged );
+  connect( mGeometryValidationModel, &QgsGeometryValidationModel::rowsInserted, this, &QgsGeometryValidationDock::raise );
 }
 
 void QgsGeometryValidationDock::gotoNextError()
