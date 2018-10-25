@@ -842,9 +842,9 @@ void QgsLayoutItemMap::paint( QPainter *painter, const QStyleOptionGraphicsItem 
       QImage image = QImage( widthInPixels, heightInPixels, QImage::Format_ARGB32 );
 
       image.fill( Qt::transparent );
-      image.setDotsPerMeterX( 1000 * destinationDpi / 25.4 );
-      image.setDotsPerMeterY( 1000 * destinationDpi / 25.4 );
       double dotsPerMM = destinationDpi / 25.4;
+      image.setDotsPerMeterX( 1000 * dotsPerMM );
+      image.setDotsPerMeterY( 1000 * dotsPerMM );
       QPainter p( &image );
 
       QPointF tl = -boundingRect().topLeft();
