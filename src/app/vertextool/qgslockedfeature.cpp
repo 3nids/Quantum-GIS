@@ -30,6 +30,7 @@
 #include "qgsproject.h"
 #include "qgsstatusbar.h"
 #include "qgsmapcanvas.h"
+#include "qgshighlight.h"
 
 
 QgsLockedFeature::QgsLockedFeature( QgsFeatureId featureId,
@@ -71,6 +72,7 @@ QgsLockedFeature::~QgsLockedFeature()
     mValidator = nullptr;
   }
 
+  mFeatureHighlight->deleteLater();
   delete mGeometry;
 }
 
@@ -224,6 +226,12 @@ void QgsLockedFeature::replaceVertexMap()
 
   // validate the geometry
   validateGeometry();
+
+  if ( mFeatureHighlight )
+    mFeatureHighlight->deleteLater();
+  mFeatureHighlight = new QgsHighlight( mCanvas, *mGeometry, mLayer );
+  mFeatureHighlight->setColor( QColor( 255, 0, 0, 128 ) );
+  mFeatureHighlight->setWidth( 2 );
 
   emit vertexMapChanged();
 }

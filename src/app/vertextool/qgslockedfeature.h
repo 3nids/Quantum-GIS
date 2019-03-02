@@ -27,6 +27,7 @@ class QgsMapLayer;
 class QgsGeometryValidator;
 class QgsVertexMarker;
 class QgsVertexEntry;
+class QgsHighlight;
 
 /**
  * Constant representing zero value for distance. It's 0 because of error in double counting.
@@ -188,6 +189,7 @@ class QgsLockedFeature: public QObject
     QgsVectorLayer *mLayer = nullptr;
     QList<QgsVertexEntry *> mVertexMap;
     QgsMapCanvas *mCanvas = nullptr;
+    QgsHighlight *mFeatureHighlight;
 
     QgsGeometryValidator *mValidator = nullptr;
     QString mTip;
