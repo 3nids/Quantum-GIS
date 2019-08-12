@@ -21,11 +21,12 @@
 #include "qgsfeature.h"
 
 #include <QComboBox>
-#include <QToolButton>
-#include <QLineEdit>
-#include <QHBoxLayout>
-#include <QStandardItemModel>
 #include "qgis_gui.h"
+
+class QHBoxLayout;
+class QVBoxLayout;
+class QLineEdit;
+class QToolButton;
 
 class QgsAttributeForm;
 class QgsVectorLayerTools;

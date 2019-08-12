@@ -15,11 +15,15 @@
 
 #include "qgsrelationreferencewidget.h"
 
+#include <QLineEdit>
 #include <QPushButton>
 #include <QDialog>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QTimer>
 #include <QCompleter>
+#include <QToolButton>
+#include <QStandardItemModel>
 
 #include "qgsattributeform.h"
 #include "qgsattributetablefiltermodel.h"
