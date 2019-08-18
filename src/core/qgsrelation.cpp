@@ -328,6 +328,11 @@ bool QgsRelation::isValid() const
   return d->mValid && !d->mReferencingLayer.isNull() && !d->mReferencedLayer.isNull() && d->mReferencingLayer.data()->isValid() && d->mReferencedLayer.data()->isValid();
 }
 
+bool QgsRelation::isComposite() const
+{
+  return d->mFieldPairs.count() > 1;
+}
+
 bool QgsRelation::hasEqualDefinition( const QgsRelation &other ) const
 {
   return d->mReferencedLayerId == other.d->mReferencedLayerId && d->mReferencingLayerId == other.d->mReferencingLayerId && d->mFieldPairs == other.d->mFieldPairs;

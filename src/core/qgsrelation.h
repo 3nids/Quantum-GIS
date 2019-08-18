@@ -345,6 +345,13 @@ class CORE_EXPORT QgsRelation
     bool isValid() const;
 
     /**
+     * Return if the relation is composite, in other words
+     * has several field pairs.
+     * \since QGIS 3.10
+     */
+    bool isComposite() const;
+
+    /**
      * Compares the two QgsRelation, ignoring the name and the ID.
      *
      * \param other The other relation

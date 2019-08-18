@@ -93,11 +93,11 @@ void QgsRelationReferenceConfigDlg::setConfig( const QVariantMap &config )
 
 void QgsRelationReferenceConfigDlg::relationChanged( int idx )
 {
-  QString relName = mComboRelation->itemData( idx ).toString();
-  QgsRelation rel = QgsProject::instance()->relationManager()->relation( relName );
+  QString relationId = mComboRelation->itemData( idx ).toString();
+  QgsRelation rel = QgsProject::instance()->relationManager()->relation( relationId );
 
   mReferencedLayer = rel.referencedLayer();
-  mExpressionWidget->setLayer( mReferencedLayer ); // set even if 0
+  mExpressionWidget->setLayer( mReferencedLayer ); // set even if null
   if ( mReferencedLayer )
   {
     mExpressionWidget->setField( mReferencedLayer->displayExpression() );
@@ -105,6 +105,11 @@ void QgsRelationReferenceConfigDlg::relationChanged( int idx )
   }
 
   loadFields();
+
+  mFilterGroupBox->setVisible( !rel.isComposite() );
+
+  loop and
+  addFilterField
 }
 
 void QgsRelationReferenceConfigDlg::mAddFilterButton_clicked()
@@ -170,8 +175,9 @@ void QgsRelationReferenceConfigDlg::loadFields()
     const QgsFields &flds = l->fields();
     for ( int i = 0; i < flds.count(); i++ )
     {
-      mAvailableFieldsList->addItem( flds.at( i ).displayName() );
-      mAvailableFieldsList->item( mAvailableFieldsList->count() - 1 )->setData( Qt::UserRole, flds.at( i ).name() );
+      QListWidgetItem *item = new QListWidgetItem( flds.at( i ).displayName() );
+      item->setData( Qt::UserRole, flds.at( i ).name() );
+      mAvailableFieldsList->addItem( item );
     }
   }
 }

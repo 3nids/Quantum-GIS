@@ -278,6 +278,14 @@ A relation is considered valid if both referenced and referencig layers are vali
 :return: ``True`` if the relation is valid
 %End
 
+    bool isComposite() const;
+%Docstring
+Return if the relation is composite, in other words
+has several field pairs.
+
+.. versionadded:: 3.10
+%End
+
     bool hasEqualDefinition( const QgsRelation &other ) const;
 %Docstring
 Compares the two QgsRelation, ignoring the name and the ID.
