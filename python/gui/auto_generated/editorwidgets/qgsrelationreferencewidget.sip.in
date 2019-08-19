@@ -59,25 +59,25 @@ returns the related feature foreign key
 
     void setEditorContext( const QgsAttributeEditorContext &context, QgsMapCanvas *canvas, QgsMessageBar *messageBar );
 
-    bool embedForm();
+    bool embedForm() const;
 %Docstring
 determines if the form of the related feature will be shown
 %End
     void setEmbedForm( bool display );
 
-    bool readOnlySelector();
+    bool readOnlySelector() const;
 %Docstring
 determines if the foreign key is shown in a combox box or a read-only line edit
 %End
     void setReadOnlySelector( bool readOnly );
 
-    bool allowMapIdentification();
+    bool allowMapIdentification() const;
 %Docstring
 determines if the widget offers the possibility to select the related feature on the map (using a dedicated map tool)
 %End
     void setAllowMapIdentification( bool allowMapIdentification );
 
-    bool orderByValue();
+    bool orderByValue() const;
 %Docstring
 If the widget will order the combobox entries by value
 %End
@@ -90,11 +90,17 @@ Sets if the widget will order the combobox entries by value
 Sets the fields for which filter comboboxes will be created
 %End
 
-    bool openFormButtonVisible();
+    bool openFormButtonVisible() const;
 %Docstring
 determines the open form button is visible in the widget
 %End
     void setOpenFormButtonVisible( bool openFormButtonVisible );
+
+    QString displayExpression() const;
+%Docstring
+defines the display expression to be used, will fallback to display expression from the layer if left empty
+%End
+    void setDisplayExpression( const QString &expression );
 
     bool chainFilters() const;
 %Docstring

@@ -18,6 +18,7 @@
 #include "qgseditorwidgetfactory.h"
 #include "qgsfields.h"
 #include "qgsproject.h"
+#include "qgsrelation.h"
 #include "qgsrelationmanager.h"
 #include "qgsvectorlayer.h"
 #include "qgsexpressionbuilderdialog.h"
@@ -41,7 +42,20 @@ QgsRelationReferenceConfigDlg::QgsRelationReferenceConfigDlg( QgsVectorLayer *vl
       mComboRelation->addItem( QStringLiteral( "%1 (%2)" ).arg( relation.id(), relation.referencedLayerId() ), relation.id() );
     else
       mComboRelation->addItem( QStringLiteral( "%1 (%2)" ).arg( relation.name(), relation.referencedLayerId() ), relation.id() );
-    if ( relation.referencedLayer() )
+
+    if ( relation.isComposite() )
+    {
+      const QList<QgsRelation::FieldPair> fieldPairs = relation.fieldPairs();
+      for ( const QgsRelation::FieldPair &fieldPair : fieldPairs )
+      {
+        if ( fieldPair.referencingField() == layer()->fields().at( field() ).name() )
+        {
+          mExpressionWidget->setField( fieldPair.referencedField() );
+          break;
+        }
+      }
+    }
+    else if ( relation.referencedLayer() )
     {
       mExpressionWidget->setField( relation.referencedLayer()->displayExpression() );
     }
@@ -67,6 +81,12 @@ void QgsRelationReferenceConfigDlg::setConfig( const QVariantMap &config )
   mCbxOrderByValue->setChecked( config.value( QStringLiteral( "OrderByValue" ), false ).toBool() );
   mCbxShowForm->setChecked( config.value( QStringLiteral( "ShowForm" ), false ).toBool() );
   mCbxShowOpenFormButton->setChecked( config.value( QStringLiteral( "ShowOpenFormButton" ), true ).toBool() );
+  QString displayExpression = config.value( QStringLiteral( "DisplayExpression" ) ).toString();
+  if ( !displayExpression.isEmpty() )
+  {
+    // apply only if defined, otherwise will fallback to display expression from layer
+    mExpressionWidget->setExpression( displayExpression );
+  }
 
   if ( config.contains( QStringLiteral( "Relation" ) ) )
   {
@@ -106,10 +126,25 @@ void QgsRelationReferenceConfigDlg::relationChanged( int idx )
 
   loadFields();
 
-  mFilterGroupBox->setVisible( !rel.isComposite() );
+  // for composite relations the config is forced with chain filters for additional fields
+  mFilterGroupBox->setDisabled( rel.isComposite() );
+  mExpressionWidget->setDisabled( rel.isComposite() );
+  if ( rel.isComposite() )
+  {
+    mFilterGroupBox->setChecked( true );
+    const QList<QgsRelation::FieldPair> fieldPairs = rel.fieldPairs();
+    for ( const QgsRelation::FieldPair &fieldPair : fieldPairs )
+    {
+      if ( fieldPair.referencingField() == layer()->fields().at( field() ).name() )
+      {
+        mExpressionWidget->setField( fieldPair.referencedField() );
+        continue;
+      }
 
-  loop and
-  addFilterField
+      addFilterField( fieldPair.referencedField() );
+    }
+    mCbxChainFilters->setChecked( true );
+  }
 }
 
 void QgsRelationReferenceConfigDlg::mAddFilterButton_clicked()
@@ -142,6 +177,7 @@ QVariantMap QgsRelationReferenceConfigDlg::config()
   myConfig.insert( QStringLiteral( "ReadOnly" ), mCbxReadOnly->isChecked() );
   myConfig.insert( QStringLiteral( "Relation" ), mComboRelation->currentData() );
   myConfig.insert( QStringLiteral( "AllowAddFeatures" ), mCbxAllowAddFeatures->isChecked() );
+  myConfig.insert( QStringLiteral( "DisplayExpression" ), mExpressionWidget->currentField() );
 
   if ( mFilterGroupBox->isChecked() )
   {
@@ -154,11 +190,6 @@ QVariantMap QgsRelationReferenceConfigDlg::config()
     myConfig.insert( QStringLiteral( "FilterFields" ), filterFields );
 
     myConfig.insert( QStringLiteral( "ChainFilters" ), mCbxChainFilters->isChecked() );
-  }
-
-  if ( mReferencedLayer )
-  {
-    mReferencedLayer->setDisplayExpression( mExpressionWidget->currentField() );
   }
 
   return myConfig;

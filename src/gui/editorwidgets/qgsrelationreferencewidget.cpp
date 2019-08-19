@@ -207,13 +207,14 @@ void QgsRelationReferenceWidget::setRelation( const QgsRelation &relation, bool 
     mReferencingLayer = relation.referencingLayer();
     mRelationName = relation.name();
     mReferencedLayer = relation.referencedLayer();
+    // TODO loop over
     mReferencedField = relation.fieldPairs().at( 0 ).second;
     if ( mComboBox )
       mComboBox->setIdentifierField( mReferencedField );
 
+    // TODO loop over
     mReferencedFieldIdx = mReferencedLayer->fields().lookupField( relation.fieldPairs().at( 0 ).second );
     mAttributeEditorFrame->setObjectName( QStringLiteral( "referencing/" ) + relation.name() );
-
 
     if ( mEmbedForm )
     {
@@ -454,6 +455,11 @@ void QgsRelationReferenceWidget::setOpenFormButtonVisible( bool openFormButtonVi
   mOpenFormButtonVisible = openFormButtonVisible;
 }
 
+void QgsRelationReferenceWidget::setDisplayExpression( const QString &expression )
+{
+  mDisplayExpression = expression;
+}
+
 void QgsRelationReferenceWidget::setChainFilters( bool chainFilters )
 {
   mChainFilters = chainFilters;
@@ -542,7 +548,7 @@ void QgsRelationReferenceWidget::init()
     }
 
     mComboBox->setSourceLayer( mReferencedLayer );
-    mComboBox->setDisplayExpression( mReferencedLayer->displayExpression() );
+    mComboBox->setDisplayExpression( mDisplayExpression );
     mComboBox->setAllowNull( mAllowNull );
     mComboBox->setIdentifierField( mReferencedField );
 

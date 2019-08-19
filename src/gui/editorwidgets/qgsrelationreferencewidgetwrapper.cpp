@@ -47,31 +47,56 @@ void QgsRelationReferenceWidgetWrapper::initWidget( QWidget *editor )
 
   mWidget->setEditorContext( *ctx, mCanvas, mMessageBar );
 
+  const QVariant relationName = config( QStringLiteral( "Relation" ) );
+  QgsRelation relation; // invalid relation by default
+  if ( relationName.isValid() )
+    relation = QgsProject::instance()->relationManager()->relation( relationName.toString() );
+  else if ( ! layer()->referencingRelations( fieldIdx() ).isEmpty() )
+    relation = layer()->referencingRelations( fieldIdx() )[0];
+
   bool showForm = config( QStringLiteral( "ShowForm" ), false ).toBool();
   bool mapIdent = config( QStringLiteral( "MapIdentification" ), false ).toBool();
   bool readOnlyWidget = config( QStringLiteral( "ReadOnly" ), false ).toBool();
   bool orderByValue = config( QStringLiteral( "OrderByValue" ), false ).toBool();
   bool showOpenFormButton = config( QStringLiteral( "ShowOpenFormButton" ), true ).toBool();
+  QString displayExpression = config( QStringLiteral( "DisplayExpression" ), relation.referencedLayer()->displayExpression() ).toString();
+
+  // for composite relations the config is forced with chain filters for additional fields
+  bool chainedFilters = config( QStringLiteral( "ChainFilters" ) ).toBool();
+  QStringList filterFields;
+  if ( relation.isValid() && relation.isComposite() )
+  {
+    chainedFilters = true;
+    const QList<QgsRelation::FieldPair> fieldPairs = relation.fieldPairs();
+    for ( const QgsRelation::FieldPair &fieldPair : fieldPairs )
+    {
+      if ( fieldPair.referencingField() == field().name() )
+      {
+        displayExpression = fieldPair.referencedField();
+        continue;
+      }
+
+      filterFields << fieldPair.referencedField();
+    }
+  }
+  else
+  {
+    filterFields = config( QStringLiteral( "FilterFields" ) ).toStringList();
+  }
 
   mWidget->setEmbedForm( showForm );
   mWidget->setReadOnlySelector( readOnlyWidget );
   mWidget->setAllowMapIdentification( mapIdent );
   mWidget->setOrderByValue( orderByValue );
   mWidget->setOpenFormButtonVisible( showOpenFormButton );
-  if ( config( QStringLiteral( "FilterFields" ), QVariant() ).isValid() )
+  mWidget->setDisplayExpression( displayExpression );
+
+  if ( !filterFields.isEmpty() )
   {
-    mWidget->setFilterFields( config( QStringLiteral( "FilterFields" ) ).toStringList() );
-    mWidget->setChainFilters( config( QStringLiteral( "ChainFilters" ) ).toBool() );
+    mWidget->setFilterFields( filterFields );
+    mWidget->setChainFilters( chainedFilters );
   }
   mWidget->setAllowAddFeatures( config( QStringLiteral( "AllowAddFeatures" ), false ).toBool() );
-
-  const QVariant relationName = config( QStringLiteral( "Relation" ) );
-
-  QgsRelation relation; // invalid relation by default
-  if ( relationName.isValid() )
-    relation = QgsProject::instance()->relationManager()->relation( relationName.toString() );
-  else if ( ! layer()->referencingRelations( fieldIdx() ).isEmpty() )
-    relation = layer()->referencingRelations( fieldIdx() )[0];
 
   // If this widget is already embedded by the same relation, reduce functionality
   do
