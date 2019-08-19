@@ -194,7 +194,7 @@ void QgsRelationReferenceWidget::updateIndex()
   }
 }
 
-void QgsRelationReferenceWidget::setRelation( const QgsRelation &relation, bool allowNullValue )
+void QgsRelationReferenceWidget::setRelation( const QgsRelation &relation, bool allowNullValue, int mainFieldPairIndex )
 {
   mAllowNull = allowNullValue;
   mRemoveFKButton->setVisible( allowNullValue && mReadOnlySelector );
@@ -207,13 +207,12 @@ void QgsRelationReferenceWidget::setRelation( const QgsRelation &relation, bool 
     mReferencingLayer = relation.referencingLayer();
     mRelationName = relation.name();
     mReferencedLayer = relation.referencedLayer();
-    // TODO loop over
-    mReferencedField = relation.fieldPairs().at( 0 ).second;
+    mainFieldPairIndex = std::min( relation.fieldPairs().count() - 1, mainFieldPairIndex );
+    mReferencedField = relation.fieldPairs().at( mainFieldPairIndex ).referencedField();
     if ( mComboBox )
       mComboBox->setIdentifierField( mReferencedField );
 
-    // TODO loop over
-    mReferencedFieldIdx = mReferencedLayer->fields().lookupField( relation.fieldPairs().at( 0 ).second );
+    mReferencedFieldIdx = mReferencedLayer->fields().lookupField( relation.fieldPairs().at( mainFieldPairIndex ).referencedField() );
     mAttributeEditorFrame->setObjectName( QStringLiteral( "referencing/" ) + relation.name() );
 
     if ( mEmbedForm )
@@ -285,7 +284,7 @@ void QgsRelationReferenceWidget::setForeignKey( const QVariant &value )
 
     mForeignKey = mFeature.attribute( mReferencedFieldIdx );
 
-    QgsExpression expr( mReferencedLayer->displayExpression() );
+    QgsExpression expr( mDisplayExpression );
     QgsExpressionContext context( QgsExpressionContextUtils::globalProjectLayerScopes( mReferencedLayer ) );
     context.setFeature( mFeature );
     QString title = expr.evaluate( &context ).toString();
@@ -733,7 +732,7 @@ void QgsRelationReferenceWidget::featureIdentified( const QgsFeature &feature )
 {
   if ( mReadOnlySelector )
   {
-    QgsExpression expr( mReferencedLayer->displayExpression() );
+    QgsExpression expr( mDisplayExpression );
     QgsExpressionContext context( QgsExpressionContextUtils::globalProjectLayerScopes( mReferencedLayer ) );
     context.setFeature( feature );
     QString title = expr.evaluate( &context ).toString();
@@ -896,7 +895,7 @@ void QgsRelationReferenceWidget::addEntry()
   // if custom text is in the combobox and the displayExpression is simply a field, use the current text for the new feature
   if ( mComboBox->itemText( mComboBox->currentIndex() ) != mComboBox->currentText() )
   {
-    int fieldIdx = mReferencedLayer->fields().lookupField( mReferencedLayer->displayExpression() );
+    int fieldIdx = mReferencedLayer->fields().lookupField( mDisplayExpression );
 
     if ( fieldIdx != -1 )
     {

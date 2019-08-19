@@ -80,7 +80,14 @@ class GUI_EXPORT QgsRelationReferenceWidget : public QWidget
 
     ~QgsRelationReferenceWidget() override;
 
-    void setRelation( const QgsRelation &relation, bool allowNullValue );
+    /**
+     * Sets the relation
+     * \param relation The relation
+     * \param allowNullValue Determines if user can set a NULL value
+     * \param mainFieldPairIndex If the relation is composite, determines which field pair
+     *        is the main one i.e. the one corresponding to the edited field index
+     */
+    void setRelation( const QgsRelation &relation, bool allowNullValue, int mainFieldPairIndex = 0 );
 
     void setRelationEditable( bool editable );
 

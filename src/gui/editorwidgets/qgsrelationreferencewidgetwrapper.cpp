@@ -54,12 +54,14 @@ void QgsRelationReferenceWidgetWrapper::initWidget( QWidget *editor )
   else if ( ! layer()->referencingRelations( fieldIdx() ).isEmpty() )
     relation = layer()->referencingRelations( fieldIdx() )[0];
 
+  bool allowNull = config( QStringLiteral( "AllowNULL" ) ).toBool();
   bool showForm = config( QStringLiteral( "ShowForm" ), false ).toBool();
   bool mapIdent = config( QStringLiteral( "MapIdentification" ), false ).toBool();
   bool readOnlyWidget = config( QStringLiteral( "ReadOnly" ), false ).toBool();
   bool orderByValue = config( QStringLiteral( "OrderByValue" ), false ).toBool();
   bool showOpenFormButton = config( QStringLiteral( "ShowOpenFormButton" ), true ).toBool();
   QString displayExpression = config( QStringLiteral( "DisplayExpression" ), relation.referencedLayer()->displayExpression() ).toString();
+  int mainFieldPairIndex = 0;
 
   // for composite relations the config is forced with chain filters for additional fields
   bool chainedFilters = config( QStringLiteral( "ChainFilters" ) ).toBool();
@@ -67,16 +69,16 @@ void QgsRelationReferenceWidgetWrapper::initWidget( QWidget *editor )
   if ( relation.isValid() && relation.isComposite() )
   {
     chainedFilters = true;
-    const QList<QgsRelation::FieldPair> fieldPairs = relation.fieldPairs();
-    for ( const QgsRelation::FieldPair &fieldPair : fieldPairs )
+    for ( int idx = 0; idx < relation.fieldPairs().count(); idx++ )
     {
-      if ( fieldPair.referencingField() == field().name() )
+      if ( relation.fieldPairs().at( idx ).referencingField() == field().name() )
       {
-        displayExpression = fieldPair.referencedField();
+        displayExpression = relation.fieldPairs().at( idx ).referencedField();
+        mainFieldPairIndex = idx;
         continue;
       }
 
-      filterFields << fieldPair.referencedField();
+      filterFields << relation.fieldPairs().at( idx ).referencedField();
     }
   }
   else
@@ -113,7 +115,7 @@ void QgsRelationReferenceWidgetWrapper::initWidget( QWidget *editor )
   }
   while ( ctx );
 
-  mWidget->setRelation( relation, config( QStringLiteral( "AllowNULL" ) ).toBool() );
+  mWidget->setRelation( relation, allowNull, mainFieldPairIndex );
 
   connect( mWidget, &QgsRelationReferenceWidget::foreignKeyChanged, this, &QgsRelationReferenceWidgetWrapper::foreignKeyChanged );
 }
