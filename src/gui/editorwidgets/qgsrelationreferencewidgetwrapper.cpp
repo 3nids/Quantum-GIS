@@ -117,7 +117,7 @@ void QgsRelationReferenceWidgetWrapper::initWidget( QWidget *editor )
 
   mWidget->setRelation( relation, allowNull, mainFieldPairIndex );
 
-  connect( mWidget, &QgsRelationReferenceWidget::foreignKeyChanged, this, &QgsRelationReferenceWidgetWrapper::foreignKeyChanged );
+  connect( mWidget, &QgsRelationReferenceWidget::foreignKeysChanged, this, &QgsRelationReferenceWidgetWrapper::foreignKeysChanged );
 }
 
 QVariant QgsRelationReferenceWidgetWrapper::value() const
@@ -168,13 +168,17 @@ void QgsRelationReferenceWidgetWrapper::setEnabled( bool enabled )
   mWidget->setRelationEditable( enabled );
 }
 
-void QgsRelationReferenceWidgetWrapper::foreignKeyChanged( QVariant value )
+void QgsRelationReferenceWidgetWrapper::foreignKeysChanged( const QVariantList &foreignKeys )
 {
-  if ( !value.isValid() || value.isNull() )
+  if ( !foreignKeys.isEmpty() )
   {
-    value = QVariant( field().type() );
+    emit valuesChanged( QVariant( field().type() ) );
   }
-  emit valuesChanged( value );
+  else
+  {
+    // TODO
+    emit valuesChanged( foreignKeys, additionalValues );
+  }
 }
 
 void QgsRelationReferenceWidgetWrapper::updateConstraintWidgetStatus()

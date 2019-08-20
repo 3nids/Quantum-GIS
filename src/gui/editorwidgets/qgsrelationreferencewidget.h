@@ -91,8 +91,18 @@ class GUI_EXPORT QgsRelationReferenceWidget : public QWidget
 
     void setRelationEditable( bool editable );
 
-    //! this sets the related feature using from the foreign key
-    void setForeignKey( const QVariant &value );
+    /**
+     * this sets the related feature using from the foreign key
+     * \deprecated since QGIS 3.10 use set setForeignKeys instead
+     */
+    Q_DECL_DEPRECATED void setForeignKey( const QVariant &value ) SIP_DEPRECATED;
+
+
+    /**
+     * Sets the foreign keys
+     * \since QGIS 3.10
+     */
+    void setForeignKeys( const QVariantList &values );
 
     //! returns the related feature foreign key
     QVariant foreignKey() const;
@@ -183,7 +193,13 @@ class GUI_EXPORT QgsRelationReferenceWidget : public QWidget
     void init();
 
   signals:
-    void foreignKeyChanged( const QVariant & );
+    Q_DECL_DEPRECATED void foreignKeyChanged( const QVariant & );
+
+    /**
+     * Is emitted whenever the field pairs are changed
+     * \since QGIS 3.10
+     */
+    void foreignKeysChanged( const QVariantList &foreignKeys );
 
   private slots:
     void highlightActionTriggered( QAction *action );
@@ -206,7 +222,7 @@ class GUI_EXPORT QgsRelationReferenceWidget : public QWidget
     void highlightFeature( QgsFeature f = QgsFeature(), CanvasExtent canvasExtent = Fixed );
     void updateAttributeEditorFrame( const QgsFeature &feature );
     void disableChainedComboBoxes( const QComboBox *cb );
-    void emitForeignKeyChanged( const QVariant &foreignKey );
+    void emitForeignKeyChanged( const QVariantList &foreignKeys );
 
     // initialized
     QgsAttributeEditorContext mEditorContext;

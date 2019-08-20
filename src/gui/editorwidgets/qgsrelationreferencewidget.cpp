@@ -253,6 +253,11 @@ void QgsRelationReferenceWidget::setRelationEditable( bool editable )
 
 void QgsRelationReferenceWidget::setForeignKey( const QVariant &value )
 {
+  setForeignKeys( QVariantList() << value );
+}
+
+void QgsRelationReferenceWidget::setForeignKeys( const QVariantList &values )
+{
   if ( !value.isValid() )
   {
     return;
@@ -320,7 +325,7 @@ void QgsRelationReferenceWidget::setForeignKey( const QVariant &value )
   highlightFeature( mFeature ); // TODO : make this async
   updateAttributeEditorFrame( mFeature );
 
-  emitForeignKeyChanged( foreignKey() );
+  emitForeignKeyChanged( foreignKeys() );
 }
 
 void QgsRelationReferenceWidget::deleteForeignKey()
@@ -352,7 +357,7 @@ void QgsRelationReferenceWidget::deleteForeignKey()
   }
   mRemoveFKButton->setEnabled( false );
   updateAttributeEditorFrame( QgsFeature() );
-  emitForeignKeyChanged( QVariant( QVariant::Int ) );
+  emitForeignKeyChanged( QVariant( QVariant::Int ), QVariantMap() );
 }
 
 QgsFeature QgsRelationReferenceWidget::referencedFeature() const
@@ -704,6 +709,7 @@ void QgsRelationReferenceWidget::comboReferenceChanged( int index )
   highlightFeature( mFeature );
   updateAttributeEditorFrame( mFeature );
 
+  // TODO
   emitForeignKeyChanged( mComboBox->identifierValue() );
 }
 
@@ -746,13 +752,15 @@ void QgsRelationReferenceWidget::featureIdentified( const QgsFeature &feature )
   }
   else
   {
-    mComboBox->setCurrentIndex( mComboBox->findData( feature.attribute( mReferencedFieldIdx ), QgsFeatureFilterModel::Role::IdentifierValueRole ) );
+    mComboBox->setCurrentIndex( mComboBox->findData( feature.attribute( mReferencedFieldIdx ),
+                                QgsFeatureFilterModel::Role::IdentifierValueRole ) );
     mFeature = feature;
   }
 
   mRemoveFKButton->setEnabled( mIsEditable );
   highlightFeature( feature );
   updateAttributeEditorFrame( feature );
+  // TODO
   emit foreignKeyChanged( foreignKey() );
 
   unsetMapTool();
@@ -942,11 +950,11 @@ void QgsRelationReferenceWidget::disableChainedComboBoxes( const QComboBox *scb 
   }
 }
 
-void QgsRelationReferenceWidget::emitForeignKeyChanged( const QVariant &foreignKey )
+void QgsRelationReferenceWidget::emitForeignKeyChanged( const QVariantList &foreignKeys )
 {
   if ( foreignKey != mForeignKey || foreignKey.isNull() != mForeignKey.isNull() )
   {
     mForeignKey = foreignKey;
-    emit foreignKeyChanged( foreignKey );
+    emit foreignKeysChanged( foreignKey, additionalKeys );
   }
 }

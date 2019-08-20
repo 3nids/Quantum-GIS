@@ -63,7 +63,7 @@ class GUI_EXPORT QgsRelationReferenceWidgetWrapper : public QgsEditorWidgetWrapp
     void setEnabled( bool enabled ) override;
 
   private slots:
-    void foreignKeyChanged( QVariant value );
+    void foreignKeysChanged( const QVariantList &foreignKeys );
 
   protected:
     void updateConstraintWidgetStatus() override;

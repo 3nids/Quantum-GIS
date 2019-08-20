@@ -55,9 +55,19 @@ Sets the relation
 
     void setRelationEditable( bool editable );
 
-    void setForeignKey( const QVariant &value );
+ void setForeignKey( const QVariant &value ) /Deprecated/;
 %Docstring
 this sets the related feature using from the foreign key
+
+.. deprecated:: since QGIS 3.10 use set setForeignKeys instead
+%End
+
+
+    void setForeignKeys( const QVariantList &values );
+%Docstring
+Sets the foreign keys
+
+.. versionadded:: 3.10
 %End
 
     QVariant foreignKey() const;
@@ -175,7 +185,14 @@ unset the currently related feature
     void init();
 
   signals:
-    void foreignKeyChanged( const QVariant & );
+ void foreignKeyChanged( const QVariant & );
+
+    void foreignKeysChanged( const QVariantList &foreignKeys );
+%Docstring
+Is emitted whenever the field pairs are changed
+
+.. versionadded:: 3.10
+%End
 
 };
 
