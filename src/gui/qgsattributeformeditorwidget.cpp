@@ -203,6 +203,7 @@ void QgsAttributeFormEditorWidget::resetValue()
     case SearchMode:
     case AggregateSearchMode:
       break;
+
     case MultiEditMode:
     {
       mMultiEditButton->setIsChanged( false );

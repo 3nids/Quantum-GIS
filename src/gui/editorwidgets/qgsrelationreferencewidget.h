@@ -112,7 +112,7 @@ class GUI_EXPORT QgsRelationReferenceWidget : public QWidget
     * returns the related feature foreign keys
     * \since QGIS 3.10
     */
-    QVariantList foreignKeys() const;
+    QVariantMap foreignKeys() const;
 
     void setEditorContext( const QgsAttributeEditorContext &context, QgsMapCanvas *canvas, QgsMessageBar *messageBar );
 
@@ -206,7 +206,7 @@ class GUI_EXPORT QgsRelationReferenceWidget : public QWidget
      * Is emitted whenever the field pairs are changed
      * \since QGIS 3.10
      */
-    void foreignKeysChanged( const QVariantList &foreignKeys );
+    void foreignKeysChanged( const QVariantMap &foreignKeys );
 
   private slots:
     void highlightActionTriggered( QAction *action );
@@ -229,18 +229,15 @@ class GUI_EXPORT QgsRelationReferenceWidget : public QWidget
     void highlightFeature( QgsFeature f = QgsFeature(), CanvasExtent canvasExtent = Fixed );
     void updateAttributeEditorFrame( const QgsFeature &feature );
     void disableChainedComboBoxes( const QComboBox *cb );
-    void emitForeignKeyChanged( const QVariantList &foreignKeys );
+    void emitForeignKeyChanged(const QVariantMap &foreignKeys );
     void setLineEditTitle();
 
     // initialized
     QgsAttributeEditorContext mEditorContext;
     QgsMapCanvas *mCanvas = nullptr;
     QgsMessageBar *mMessageBar = nullptr;
-    QVariantList mForeignKeys;
+    QVariantMap mForeignKeys; // fieldName, value
     QgsFeature mFeature;
-    // Index of the referenced layer key
-    QList<int> mReferencedFieldIdxs;
-    QStringList mReferencedFields;
     bool mAllowNull = true;
     QString mDisplayExpression;
     QgsHighlight *mHighlight = nullptr;

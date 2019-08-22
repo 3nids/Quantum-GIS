@@ -472,7 +472,7 @@ void QgsFeatureFilterModel::setExtraIdentifierValuesUnguarded( const QVariantLis
     if ( extraIdentifierValues.isEmpty() )
     {
       QVariantList nullAttributes;
-      for ( const QString &fieldName : mIdentifierFields )
+      for ( const QString &fieldName : qgis::as_const( mIdentifierFields ) )
       {
         int idx = mSourceLayer->fields().indexOf( fieldName );
         nullAttributes << QVariant( mSourceLayer->fields().at( idx ).type() );
@@ -575,6 +575,7 @@ void QgsFeatureFilterModel::setIdentifierFields( const QStringList &identifierFi
 
   mIdentifierFields = identifierFields;
   emit identifierFieldChanged();
+  setExtraIdentifierValues( QVariantList() );
 }
 
 void QgsFeatureFilterModel::reload()

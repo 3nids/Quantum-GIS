@@ -257,16 +257,34 @@ void QgsFeatureListComboBox::setIdentifierValue( const QVariant &identifierValue
 
 void QgsFeatureListComboBox::setIdentifierValues( const QVariantList &identifierValues )
 {
-  mModel->setExtraIdentifierValue( identifierValues );
+  mModel->setExtraIdentifierValues( identifierValues );
 }
 
 QgsFeatureRequest QgsFeatureListComboBox::currentFeatureRequest() const
 {
-  // TODO
-  if ( mModel->extraIdentifierValue().isNull() )
+  if ( mModel->extraIdentifierValues().isEmpty() )
+  {
     return QgsFeatureRequest().setFilterFids( QgsFeatureIds() ); // NULL: Return a request that's guaranteed to not return anything
+  }
   else
-    return QgsFeatureRequest().setFilterExpression( QStringLiteral( "%1 = %2" ).arg( QgsExpression::quotedColumnRef( mModel->identifierField() ), QgsExpression::quotedValue( mModel->extraIdentifierValue() ) ) );
+  {
+    QStringList filtersAttrs;
+    const QStringList identifierFields = mModel->identifierFields();
+    const QVariantList values = mModel->extraIdentifierValues();
+    for ( int i = 0; i < identifierFields.count(); i++ )
+    {
+      if ( i >= values.count() )
+      {
+        filtersAttrs << QgsExpression::createFieldEqualityExpression( identifierFields.at( i ), QVariant() );
+      }
+      else
+      {
+        filtersAttrs << QgsExpression::createFieldEqualityExpression( identifierFields.at( i ), values.at( i ) );
+      }
+    }
+    const QString expression = filtersAttrs.join( QStringLiteral( " AND " ) );
+    return QgsFeatureRequest().setFilterExpression( expression );
+  }
 }
 
 QString QgsFeatureListComboBox::filterExpression() const

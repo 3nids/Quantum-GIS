@@ -133,7 +133,7 @@ void TestQgsFeatureListComboBox::testSetGetForeignKey()
 
   QVERIFY( cb->identifierValue().isNull() );
 
-  cb->setIdentifierValues( 20 );
+  cb->setIdentifierValues( QVariantList() << 20 );
   QCOMPARE( cb->identifierValue(), QVariant( 20 ) );
 }
 

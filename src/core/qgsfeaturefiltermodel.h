@@ -138,6 +138,7 @@ class CORE_EXPORT QgsFeatureFilterModel : public QAbstractItemModel
     /**
      * The identifier field should be a unique field that can be used to identify individual features.
      * It is normally set to the primary key of the layer.
+     * If there are several identifier fields defined, the behavior is not guarenteed
      * \deprecated since QGIS 3.10 use identifierFields instead
      */
     Q_DECL_DEPRECATED QString identifierField() const;
@@ -333,7 +334,6 @@ class CORE_EXPORT QgsFeatureFilterModel : public QAbstractItemModel
     bool mIsSettingExtraIdentifierValue = false;
 
     QStringList mIdentifierFields;
-
     QVariantList mExtraIdentifierValues;
 
     int mExtraIdentifierValueIndex = -1;

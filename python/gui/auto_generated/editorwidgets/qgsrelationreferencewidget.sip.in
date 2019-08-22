@@ -75,7 +75,7 @@ returns the related feature foreign key
 .. deprecated:: since QGIS 3.10
 %End
 
-    QVariantList foreignKeys() const;
+    QVariantMap foreignKeys() const;
 %Docstring
 returns the related feature foreign keys
 

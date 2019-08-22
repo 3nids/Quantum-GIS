@@ -317,24 +317,21 @@ void QgsRelationReferenceWidget::setForeignKeys( const QVariantMap &values )
   }
   else
   {
-    //mComboBox->setIdentifierValues( value );
+    mComboBox->setIdentifierValues( values.values() );
 
     if ( mChainFilters )
     {
-      // TODO
-//      if (!mRelation.isComposite())
-//          QVariant nullValue = QgsApplication::nullRepresentation();
-//          QgsFeatureRequest request = mComboBox->currentFeatureRequest();
-//          mReferencedLayer->getFeatures( request ).nextFeature( mFeature );
-//      }
+      QVariant nullValue = QgsApplication::nullRepresentation();
+      QgsFeatureRequest request = mComboBox->currentFeatureRequest();
+      mReferencedLayer->getFeatures( request ).nextFeature( mFeature );
 
-//      const int count = std::min( mFilterComboBoxes.size(), mFilterFields.size() );
-//      for ( int i = 0; i < count; i++ )
-//      {
-//        QVariant v = mFeature.attribute( mFilterFields[i] );
-//        QString f = v.isNull() ? nullValue.toString() : v.toString();
-//        mFilterComboBoxes.at( i )->setCurrentIndex( mFilterComboBoxes.at( i )->findText( f ) );
-//      }
+      const int count = std::min( mFilterComboBoxes.size(), mFilterFields.size() );
+      for ( int i = 0; i < count; i++ )
+      {
+        QVariant v = mFeature.attribute( mFilterFields[i] );
+        QString f = v.isNull() ? nullValue.toString() : v.toString();
+        mFilterComboBoxes.at( i )->setCurrentIndex( mFilterComboBoxes.at( i )->findText( f ) );
+      }
     }
   }
 
@@ -342,8 +339,7 @@ void QgsRelationReferenceWidget::setForeignKeys( const QVariantMap &values )
   highlightFeature( mFeature ); // TODO : make this async
   updateAttributeEditorFrame( mFeature );
 
-  // TODO
-  //emitForeignKeyChanged( foreignKeys() );
+  emitForeignKeyChanged( foreignKeys() );
 }
 
 void QgsRelationReferenceWidget::deleteForeignKeys()
@@ -410,7 +406,7 @@ void QgsRelationReferenceWidget::showIndeterminateState()
   }
   else
   {
-    whileBlocking( mComboBox )->setIdentifierValue( QVariant() );
+    whileBlocking( mComboBox )->setIdentifierValues( QVariantList() );
   }
   mRemoveFKButton->setEnabled( false );
   updateAttributeEditorFrame( QgsFeature() );
@@ -425,7 +421,7 @@ QVariant QgsRelationReferenceWidget::foreignKey() const
     return list.at( 0 );
 }
 
-QVariantList QgsRelationReferenceWidget::foreignKeys() const
+QVariantMap QgsRelationReferenceWidget::foreignKeys() const
 {
   if ( mReadOnlySelector )
   {
@@ -741,8 +737,7 @@ void QgsRelationReferenceWidget::comboReferenceChanged( int index )
   highlightFeature( mFeature );
   updateAttributeEditorFrame( mFeature );
 
-  // TODO
-  //emitForeignKeyChanged( mComboBox->identifierValue() );
+  emitForeignKeyChanged( mComboBox->identifierValues() );
 }
 
 void QgsRelationReferenceWidget::updateAttributeEditorFrame( const QgsFeature &feature )
@@ -941,8 +936,8 @@ void QgsRelationReferenceWidget::addEntry()
   if ( mEditorContext.vectorLayerTools()->addFeature( mReferencedLayer, attributes, QgsGeometry(), &f ) )
   {
     QVariantList values;
-    for (const QString &field : qgis::as_const(mReferencedFields))
-        values << f.attribute(field);
+    for ( const QString &field : qgis::as_const( mReferencedFields ) )
+      values << f.attribute( field );
     mComboBox->setIdentifierValues( values );
     mAddEntryButton->setEnabled( false );
   }
@@ -980,14 +975,16 @@ void QgsRelationReferenceWidget::disableChainedComboBoxes( const QComboBox *scb 
   }
 }
 
-void QgsRelationReferenceWidget::emitForeignKeyChanged( const QVariantList &foreignKeys )
+void QgsRelationReferenceWidget::emitForeignKeyChanged( const QVariantMap &foreignKeys )
 {
-  // TODO
-//  if ( foreignKey != mForeignKey || foreignKey.isNull() != mForeignKey.isNull() )
-//  {
-//    mForeignKey = foreignKey;
-//    emit foreignKeysChanged( foreignKey, additionalKeys );
-  //  }
+  if ( foreignKeys != mForeignKeys || foreignKeys.isEmpty() != mForeignKeys.isEmpty() )
+  {
+    mForeignKeys = foreignKeys;
+    Q_NOWARN_DEPRECATED_PUSH
+    emit foreignKeyChanged( foreignKeys.isEmpty() ? QVariant() : foreignKeys.values().at( 0 ) );
+    Q_NOWARN_DEPRECATED_POP
+    emit foreignKeysChanged( foreignKeys );
+  }
 }
 
 void QgsRelationReferenceWidget::setLineEditTitle()

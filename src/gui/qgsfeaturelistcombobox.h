@@ -44,7 +44,8 @@ class GUI_EXPORT QgsFeatureListComboBox : public QComboBox
     Q_PROPERTY( QgsVectorLayer *sourceLayer READ sourceLayer WRITE setSourceLayer NOTIFY sourceLayerChanged )
     Q_PROPERTY( QString displayExpression READ displayExpression WRITE setDisplayExpression NOTIFY displayExpressionChanged )
     Q_PROPERTY( QString filterExpression READ filterExpression WRITE setFilterExpression NOTIFY filterExpressionChanged )
-    Q_PROPERTY( QVariant identifierValue READ identifierValue WRITE setIdentifierValues NOTIFY identifierValueChanged )
+    Q_PROPERTY( QVariant identifierValue READ identifierValue WRITE setIdentifierValue NOTIFY identifierValueChanged )
+    Q_PROPERTY( QVariantList identifierValues READ identifierValues WRITE setIdentifierValues NOTIFY identifierValueChanged )
     Q_PROPERTY( QString identifierField READ identifierField WRITE setIdentifierField NOTIFY identifierFieldChanged )
     Q_PROPERTY( bool allowNull READ allowNull WRITE setAllowNull NOTIFY allowNullChanged )
 
@@ -155,7 +156,7 @@ class GUI_EXPORT QgsFeatureListComboBox : public QComboBox
      * Normally the primary key of the layer.
      * \deprecated since QGIS 3.10
      */
-    QString identifierField() const;
+    Q_DECL_DEPRECATED QString identifierField() const;
 
     /**
      * Field name that will be used to uniquely identify the current feature.
@@ -169,7 +170,7 @@ class GUI_EXPORT QgsFeatureListComboBox : public QComboBox
      * Normally the primary key of the layer.
      * \deprecated since QGIS 3.10
      */
-    void setIdentifierField( const QString &identifierField );
+    Q_DECL_DEPRECATED void setIdentifierField( const QString &identifierField );
 
     /**
      * Field name that will be used to uniquely identify the current feature.

@@ -131,7 +131,7 @@ Determines if a NULL value should be available in the list.
 Determines if a NULL value should be available in the list.
 %End
 
-    QString identifierField() const;
+ QString identifierField() const;
 %Docstring
 Field name that will be used to uniquely identify the current feature.
 Normally the primary key of the layer.
@@ -147,7 +147,7 @@ Normally the primary key of the layer.
 .. versionadded:: 3.10
 %End
 
-    void setIdentifierField( const QString &identifierField );
+ void setIdentifierField( const QString &identifierField );
 %Docstring
 Field name that will be used to uniquely identify the current feature.
 Normally the primary key of the layer.

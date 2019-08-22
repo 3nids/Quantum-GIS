@@ -134,7 +134,7 @@ QVariant QgsFilterFeaturePicker::identifierValue() const
 
 void QgsFilterFeaturePicker::setIdentifierValue( const QVariant &identifierValue )
 {
-  mFeatureListComboBox->setIdentifierValues( identifierValue );
+  mFeatureListComboBox->setIdentifierValues( QVariantList() << identifierValue );
 }
 
 QgsFeatureRequest QgsFilterFeaturePicker::currentFeatureRequest() const

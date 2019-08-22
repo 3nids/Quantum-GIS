@@ -126,7 +126,7 @@ class GUI_EXPORT QgsAttributeFormEditorWidget : public QgsAttributeFormWidget
   private slots:
 
     //! Triggered when editor widget's value changes
-    void editorWidgetValuesChanged(const QVariant &value, const QVariantMap &additionalFieldValues );
+    void editorWidgetValuesChanged( const QVariant &value, const QVariantMap &additionalFieldValues );
 
     //! Triggered when multi edit tool button requests value reset
     void resetValue();

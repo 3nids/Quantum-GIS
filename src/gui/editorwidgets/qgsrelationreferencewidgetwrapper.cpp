@@ -160,7 +160,11 @@ void QgsRelationReferenceWidgetWrapper::showIndeterminateState()
 
 QVariantMap QgsRelationReferenceWidgetWrapper::additionalFieldValues() const
 {
-  // TODO
+
+   QVariantList fkList = mWidget->foreignKeys();
+  foreignKeyValues.insert( field().name(), val );
+  fkList.removeOne( field.name() )
+  todo
 }
 
 void QgsRelationReferenceWidgetWrapper::updateValues( const QVariant &val, const QVariantMap &additionalValues )
