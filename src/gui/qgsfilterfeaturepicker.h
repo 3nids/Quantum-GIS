@@ -1,10 +1,10 @@
 /***************************************************************************
-  qgsfeaturelistcombobox.h - QgsFeatureListComboBox
+  qgsfilterfeaturepicker.h - QgsFilterFeaturePicker
 
  ---------------------
- begin                : 10.3.2017
- copyright            : (C) 2017 by Matthias Kuhn
- email                : matthias@opengis.ch
+ begin                : 20.08.2019
+ copyright            : (C) 2019 by Denis Rouzaud
+ email                : denis@opengis.ch
  ***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -13,47 +13,44 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#ifndef QGSFIELDLISTCOMBOBOX_H
-#define QGSFIELDLISTCOMBOBOX_H
 
+#ifndef QGSFILTERFEATUREPICKER_H
+#define QGSFILTERFEATUREPICKER_H
+
+#include <QWidget>
 #include <QComboBox>
 
-#include "qgsfeature.h"
-#include "qgsfeaturerequest.h"
 #include "qgis_gui.h"
 
+
+class QHBoxLayout;
+
+class QgsFeatureListComboBox;
 class QgsVectorLayer;
-class QgsFeatureFilterModel;
-class QgsAnimatedIcon;
-class QgsFilterLineEdit;
+class QgsFeatureRequest;
 
 
 /**
  * \ingroup gui
- * This offers a combobox with autocompleter that allows selecting features from a layer.
+ * This offers a combobox with autocompleter that allows selecting features from a layer with a series of comobobox to filter features.
  *
- * It will show up to 100 entries at a time. The entries can be chosen based on the displayExpression
- * and whenever text is typed into the combobox, the completer and popup will adjust to features matching the typed text.
- *
- * \since QGIS 3.0
+ * \see QgsFeatureListComboBox, QgsChainedFilterFeaturePicker
+ * \since QGIS 3.10
  */
-class GUI_EXPORT QgsFeatureListComboBox : public QComboBox
+class GUI_EXPORT QgsFilterFeaturePicker : public QWidget
 {
     Q_OBJECT
 
+  public:
+    explicit QgsFilterFeaturePicker( QWidget *parent = nullptr );
+
     Q_PROPERTY( QgsVectorLayer *sourceLayer READ sourceLayer WRITE setSourceLayer NOTIFY sourceLayerChanged )
+    Q_PROPERTY( QStringList filterFields READ filterFields WRITE setFilterFields NOTIFY filterFieldsChanged )
     Q_PROPERTY( QString displayExpression READ displayExpression WRITE setDisplayExpression NOTIFY displayExpressionChanged )
     Q_PROPERTY( QString filterExpression READ filterExpression WRITE setFilterExpression NOTIFY filterExpressionChanged )
-    Q_PROPERTY( QVariant identifierValue READ identifierValue WRITE setIdentifierValues NOTIFY identifierValueChanged )
+    Q_PROPERTY( QVariant identifierValue READ identifierValue WRITE setIdentifierValue NOTIFY identifierValueChanged )
     Q_PROPERTY( QString identifierField READ identifierField WRITE setIdentifierField NOTIFY identifierFieldChanged )
     Q_PROPERTY( bool allowNull READ allowNull WRITE setAllowNull NOTIFY allowNullChanged )
-
-  public:
-
-    /**
-     * Create a new QgsFeatureListComboBox, optionally specifying a \a parent.
-     */
-    QgsFeatureListComboBox( QWidget *parent = nullptr );
 
     /**
      * The layer from which features should be listed.
@@ -66,10 +63,14 @@ class GUI_EXPORT QgsFeatureListComboBox : public QComboBox
     void setSourceLayer( QgsVectorLayer *sourceLayer );
 
     /**
-     * Sets the current index by using the given feature
-     * \since QGIS 3.10
+     * Returns the fields names used as filters
      */
-    void setCurrentFeature( const QgsFeature &feature );
+    QStringList filterFields() const;
+
+    /**
+     * Returns the fields names used as filters
+     */
+    void setFilterFields( const QStringList &filterFields );
 
     /**
      * The display expression will be used to display features as well as
@@ -92,47 +93,26 @@ class GUI_EXPORT QgsFeatureListComboBox : public QComboBox
     /**
      * Returns the current index of the NULL value, or -1 if NULL values are
      * not allowed.
-     *
-     * \since QGIS 3.2
      */
     int nullIndex() const;
 
     /**
      * An additional expression to further restrict the available features.
      * This can be used to integrate additional spatial or other constraints.
-     *
-     * TODO!
      */
     void setFilterExpression( const QString &filterExpression );
 
     /**
      * The identifier value of the currently selected feature. A value from the
      * identifierField.
-     * \deprecated QGIS 3.10
      */
-    Q_DECL_DEPRECATED QVariant identifierValue() const;
-
-    /**
-     * The identifier values of the currently selected feature. A value from the
-     * identifierField.
-     * \since QGIS 3.10
-     */
-    QVariantList identifierValues() const;
-
+    QVariant identifierValue() const;
 
     /**
      * The identifier value of the currently selected feature. A value from the
      * identifierField.
-     * \deprecated since QGIS 3.10 use setIdentifierValues
      */
-    Q_DECL_DEPRECATED void setIdentifierValue( const QVariant &identifierValue ) SIP_DEPRECATED;
-
-    /**
-     * The identifier values of the currently selected feature. A value from the
-     * identifierFields.
-     * \since QGIS 3.10
-     */
-    void setIdentifierValues( const QVariantList &identifierValues );
+    void setIdentifierValue( const QVariant &identifierValue );
 
     /**
      * Shorthand for getting a feature request to query the currently selected
@@ -153,46 +133,24 @@ class GUI_EXPORT QgsFeatureListComboBox : public QComboBox
     /**
      * Field name that will be used to uniquely identify the current feature.
      * Normally the primary key of the layer.
-     * \deprecated since QGIS 3.10
      */
     QString identifierField() const;
 
     /**
      * Field name that will be used to uniquely identify the current feature.
      * Normally the primary key of the layer.
-     * \since QGIS 3.10
-     */
-    QStringList identifierFields() const;
-
-    /**
-     * Field name that will be used to uniquely identify the current feature.
-     * Normally the primary key of the layer.
-     * \deprecated since QGIS 3.10
      */
     void setIdentifierField( const QString &identifierField );
-
-    /**
-     * Field name that will be used to uniquely identify the current feature.
-     * Normally the primary key of the layer.
-     * \since QGIS 3.10
-     */
-    void setIdentifierFields( const QStringList &identifierFields );
-
-    /**
-     * The index of the currently selected item.
-     */
-    QModelIndex currentModelIndex() const;
-
-    void focusOutEvent( QFocusEvent *event ) override;
-
-    void keyPressEvent( QKeyEvent *event ) override;
 
   signals:
 
     /**
+      * Filters fields have changed
+      */
+    void filterFieldsChanged();
+
+    /**
      * The underlying model has been updated.
-     *
-     * \since QGIS 3.2
      */
     void modelUpdated();
 
@@ -231,40 +189,12 @@ class GUI_EXPORT QgsFeatureListComboBox : public QComboBox
     void allowNullChanged();
 
   private slots:
-    void onCurrentTextChanged( const QString &text );
-    void onFilterUpdateCompleted();
-    void onLoadingChanged();
-    void onItemSelected( const QModelIndex &index );
-    void onCurrentIndexChanged( int i );
-    void onActivated( QModelIndex index );
-    void storeLineEditState();
-    void restoreLineEditState();
-    void onDataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>() );
+    void filtersChanged();
 
   private:
-    struct LineEditState
-    {
-      void store( QLineEdit *lineEdit );
-      void restore( QLineEdit *lineEdit ) const;
-
-      QString text;
-      int selectionStart;
-      int selectionLength;
-      int cursorPosition;
-    };
-
-    QgsFeatureFilterModel *mModel = nullptr;
-    QCompleter *mCompleter = nullptr;
-    QString mDisplayExpression;
-    QgsFilterLineEdit *mLineEdit;
-    bool mPopupRequested = false;
-    bool mIsCurrentlyEdited = false;
-    bool mHasStoredEditState = false;
-    LineEditState mLineEditState;
-
-    friend class TestQgsFeatureListComboBox;
+    QgsFeatureListComboBox *mFeatureListComboBox;
+    QHBoxLayout *mFiltersLayout;
+    QMap<QString, QComboBox *> mFilterFieldsComboBoxes;
 };
 
-
-
-#endif // QGSFIELDLISTCOMBOBOX_H
+#endif // QGSFILTERFEATUREPICKER_H

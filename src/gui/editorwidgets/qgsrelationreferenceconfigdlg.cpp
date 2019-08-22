@@ -129,8 +129,10 @@ void QgsRelationReferenceConfigDlg::relationChanged( int idx )
   // for composite relations the config is forced with chain filters for additional fields
   mFilterGroupBox->setDisabled( rel.isComposite() );
   mExpressionWidget->setDisabled( rel.isComposite() );
+  mCbxReadOnly->setDisabled( rel.isComposite() );
   if ( rel.isComposite() )
   {
+    mCbxReadOnly->setChecked( false );
     mFilterGroupBox->setChecked( true );
     const QList<QgsRelation::FieldPair> fieldPairs = rel.fieldPairs();
     for ( const QgsRelation::FieldPair &fieldPair : fieldPairs )

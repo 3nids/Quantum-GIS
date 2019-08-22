@@ -88,14 +88,16 @@ class GUI_EXPORT QgsEditorWidgetWrapper : public QgsWidgetWrapper
      * Return the list of additional fields which the editor handles
      * \since QGIS 3.10
      */
-    virtual QgsAttributeList additionalFields() const {return QgsAttributeList();}
+    QgsAttributeList additionalFields() const {return mAdditionalFieldIndexes;}
+
+    void setAdditionalFields( const QgsAttributeList &additionalFieldIndexes );
 
     /**
      * Will be used to access the widget's values for potential additional fields handled by the widget
      * \returns A map of additional field names with their corresponding values
      * \since QGIS 3.10
      */
-    virtual QgsAttributeMap additionalFieldValues() {return QgsAttributeMap();}
+    virtual QVariantMap additionalFieldValues() const {return QVariantMap();}
 
     /**
      * Access the field index.
@@ -253,7 +255,7 @@ class GUI_EXPORT QgsEditorWidgetWrapper : public QgsWidgetWrapper
      * \param addtionalFieldValues A map of additional field names with their corresponding values
      * \since QGIS 3.10
      */
-    void valuesChanged( const QVariant &value, const QgsAttributeMap &additionalFieldValues = QgsAttributeMap() );
+    void valuesChanged( const QVariant &value, const QVariantMap &additionalFieldValues = QVariantMap() );
 
     /**
      * Emit this signal when the constraint status changed.
@@ -297,7 +299,7 @@ class GUI_EXPORT QgsEditorWidgetWrapper : public QgsWidgetWrapper
      * to reflect the new values.
      * \since QGIS 3.10
      */
-    void setValues( const QVariant &value, const QgsAttributeMap &additionalValues );
+    void setValues( const QVariant &value, const QVariantMap &additionalValues );
 
     /**
      * Will call the value() method to determine the emitted value
@@ -356,17 +358,16 @@ class GUI_EXPORT QgsEditorWidgetWrapper : public QgsWidgetWrapper
     * \note Will be pure virtual in QGIS 4.x
     * \since QGIS 3.10
     */
-    virtual void updateValues( const QVariant &value, const QgsAttributeMap &additionalValues = QgsAttributeMap() ); //TODO QGIS 4: make it pure virtual
+    virtual void updateValues( const QVariant &value, const QVariantMap &additionalValues = QVariantMap() ); //TODO QGIS 4: make it pure virtual
 
-    // TODO QGIS 4: remove
-    bool isRunningDeprecatedSetValue = false;
+    //! avoid infinite loop with deprecated method default implementation
+    bool isRunningDeprecatedSetValue = false; // TODO QGIS 4: remove
 
-    /**
-     * mFieldIdx the widget feature field id
-     */
+    //! mFieldIdx the widget feature field id
     int mFieldIdx = -1;
 
-    QList<int> mAdditionalFieldIndexes;
+    //! Addiotional fields indexes
+    QgsAttributeList mAdditionalFieldIndexes;
 
     /**
      * The feature currently being edited, in its current state

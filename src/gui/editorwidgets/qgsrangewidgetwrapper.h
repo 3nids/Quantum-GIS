@@ -77,7 +77,7 @@ class GUI_EXPORT QgsRangeWidgetWrapper : public QgsEditorWidgetWrapper
     void valueChangedVariant( const QVariant & );
 
   private:
-    void updateValues( const QVariant &value, const QgsAttributeMap & = QgsAttributeMap() ) override;
+    void updateValues( const QVariant &value, const QVariantMap & = QVariantMap() ) override;
 
     QSpinBox *mIntSpinBox = nullptr;
     QDoubleSpinBox *mDoubleSpinBox = nullptr;

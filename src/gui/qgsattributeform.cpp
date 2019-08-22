@@ -246,15 +246,15 @@ void QgsAttributeForm::changeAttribute( const QString &field, const QVariant &va
     QgsEditorWidgetWrapper *eww = qobject_cast<QgsEditorWidgetWrapper *>( ww );
     if ( eww && eww->field().name() == field )
     {
-      eww->setValues( value, QgsAttributeMap() );
+      eww->setValues( value, QVariantMap() );
       eww->setHint( hintText );
     }
     int index = mLayer->fields().indexFromName( field );
     if ( eww->additionalFields().contains( index ) )
     {
       QVariant mainValue = eww->value();
-      QgsAttributeMap additionalFieldValues = eww->additionalFieldValues();
-      additionalFieldValues[index] = value;
+      QVariantMap additionalFieldValues = eww->additionalFieldValues();
+      additionalFieldValues[field] = value;
       eww->setValues( mainValue, additionalFieldValues );
       eww->setHint( hintText );
     }
@@ -775,7 +775,7 @@ QString QgsAttributeForm::createFilterExpression() const
 }
 
 
-void QgsAttributeForm::onAttributeChanged( const QVariant &value, const QgsAttributeMap &additionalFieldValues )
+void QgsAttributeForm::onAttributeChanged( const QVariant &value, const QVariantMap &additionalFieldValues )
 {
   QgsEditorWidgetWrapper *eww = qobject_cast<QgsEditorWidgetWrapper *>( sender() );
   Q_ASSERT( eww );
@@ -797,11 +797,10 @@ void QgsAttributeForm::onAttributeChanged( const QVariant &value, const QgsAttri
       emit widgetValueChanged( eww->field().name(), value, !mIsSettingFeature );
 
       // also emit the signal for additional values
-      QgsAttributeMap::const_iterator it = additionalFieldValues.constBegin();
+      QVariantMap::const_iterator it = additionalFieldValues.constBegin();
       for ( ; it != additionalFieldValues.constEnd(); ++it )
       {
-        const QString fieldName = mLayer->fields().at( it.key() ).name();
-        emit widgetValueChanged( fieldName, it.value(), !mIsSettingFeature );
+        emit widgetValueChanged( it.key(), it.value(), !mIsSettingFeature );
       }
 
       signalEmitted = true;

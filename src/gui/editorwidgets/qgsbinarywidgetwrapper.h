@@ -67,7 +67,7 @@ class GUI_EXPORT QgsBinaryWidgetWrapper : public QgsEditorWidgetWrapper
     void clear();
 
   private:
-    void updateValues( const QVariant &value, const QgsAttributeMap & = QgsAttributeMap() ) override;
+    void updateValues( const QVariant &value, const QVariantMap & = QVariantMap() ) override;
 
     QString defaultPath();
 

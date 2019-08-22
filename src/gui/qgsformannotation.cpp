@@ -100,10 +100,11 @@ QWidget *QgsFormAnnotation::createDesignerWidget( const QString &filePath )
           if ( eww )
           {
             const QgsAttributeList additionalFields = eww->additionalFields();
-            QgsAttributeMap additionalFieldValues;
+            QVariantMap additionalFieldValues;
             for ( int index : additionalFields )
             {
-              additionalFieldValues.insert( index, attrs.at( index ) );
+              QString fieldName = vectorLayer->fields().at(index).name();
+              additionalFieldValues.insert( fieldName, attrs.at( index ) );
             }
             eww->setValues( attrs.at( i ), additionalFieldValues );
           }

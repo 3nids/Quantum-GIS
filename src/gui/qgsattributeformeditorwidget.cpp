@@ -132,7 +132,8 @@ void QgsAttributeFormEditorWidget::changesCommitted()
   if ( mEditorWidget )
   {
     mPreviousValue = mEditorWidget->value();
-    mPreviousAdditionalValues = mEditorWidget->additionalFieldValues();
+    // TODO
+    //mPreviousAdditionalValues = mEditorWidget->additionalFieldValues();
   }
 
   setIsMixed( false );
@@ -147,7 +148,8 @@ void QgsAttributeFormEditorWidget::initialize( const QVariant &initialValue, boo
   if ( mEditorWidget )
   {
     mBlockValueUpdate = true;
-    mEditorWidget->setValues( initialValue, additionalFieldValues );
+    // TODO
+    //mEditorWidget->setValues( initialValue, additionalFieldValues );
     mBlockValueUpdate = false;
   }
   mPreviousValue = initialValue;
@@ -164,7 +166,7 @@ QVariant QgsAttributeFormEditorWidget::currentValue() const
 
 
 
-void QgsAttributeFormEditorWidget::editorWidgetValuesChanged( const QVariant &value, const QgsAttributeMap &additionalFieldValues )
+void QgsAttributeFormEditorWidget::editorWidgetValuesChanged( const QVariant &value, const QVariantMap &additionalFieldValues )
 {
   if ( mBlockValueUpdate )
     return;
@@ -189,7 +191,10 @@ void QgsAttributeFormEditorWidget::resetValue()
   mIsChanged = false;
   mBlockValueUpdate = true;
   if ( mEditorWidget )
-    mEditorWidget->setValues( mPreviousValue, mPreviousAdditionalValues );
+  {
+    // TODO
+    //mEditorWidget->setValues( mPreviousValue, mPreviousAdditionalValues );
+  }
   mBlockValueUpdate = false;
 
   switch ( mode() )

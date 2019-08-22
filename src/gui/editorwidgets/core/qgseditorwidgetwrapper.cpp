@@ -31,6 +31,11 @@ QgsEditorWidgetWrapper::QgsEditorWidgetWrapper( QgsVectorLayer *vl, int fieldIdx
 {
 }
 
+void QgsEditorWidgetWrapper::setAdditionalFields( const QgsAttributeList &additionalFieldIndexes )
+{
+  mAdditionalFieldIndexes = additionalFieldIndexes;
+}
+
 int QgsEditorWidgetWrapper::fieldIdx() const
 {
   return mFieldIdx;
@@ -69,21 +74,26 @@ void QgsEditorWidgetWrapper::setEnabled( bool enabled )
 void QgsEditorWidgetWrapper::setFeature( const QgsFeature &feature )
 {
   setFormFeature( feature );
-  QgsAttributeMap newAdditionalFieldValues;
+
+  QVariantMap newAdditionalFieldValues;
   const QgsAttributeList additionalFieldIndexes = additionalFields();
   for ( int fieldIndex : additionalFieldIndexes )
-    newAdditionalFieldValues.insert( fieldIndex, feature.attribute( fieldIndex ) );
+  {
+    QString fieldName = layer()->fields().at( fieldIndex ).name();
+    newAdditionalFieldValues.insert( fieldName, feature.attribute( fieldIndex ) );
+  }
+
   setValues( feature.attribute( mFieldIdx ), newAdditionalFieldValues );
 }
 
 void QgsEditorWidgetWrapper::setValue( const QVariant &value )
 {
   isRunningDeprecatedSetValue = true;
-  updateValues( value, QgsAttributeMap() );
+  updateValues( value, QVariantMap() );
   isRunningDeprecatedSetValue = false;
 }
 
-void QgsEditorWidgetWrapper::setValues( const QVariant &value, const QgsAttributeMap &additionalValues )
+void QgsEditorWidgetWrapper::setValues( const QVariant &value, const QVariantMap &additionalValues )
 {
   updateValues( value, additionalValues );
 }
@@ -123,7 +133,7 @@ bool QgsEditorWidgetWrapper::setFormFeatureAttribute( const QString &attributeNa
   return mFormFeature.setAttribute( attributeName, attributeValue );
 }
 
-void QgsEditorWidgetWrapper::updateValues( const QVariant &value, const QgsAttributeMap &additionalValues )
+void QgsEditorWidgetWrapper::updateValues( const QVariant &value, const QVariantMap &additionalValues )
 {
   Q_UNUSED( additionalValues );
   Q_NOWARN_DEPRECATED_PUSH

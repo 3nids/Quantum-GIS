@@ -60,31 +60,38 @@ void QgsRelationReferenceWidgetWrapper::initWidget( QWidget *editor )
   bool readOnlyWidget = config( QStringLiteral( "ReadOnly" ), false ).toBool();
   bool orderByValue = config( QStringLiteral( "OrderByValue" ), false ).toBool();
   bool showOpenFormButton = config( QStringLiteral( "ShowOpenFormButton" ), true ).toBool();
-  QString displayExpression = config( QStringLiteral( "DisplayExpression" ), relation.referencedLayer()->displayExpression() ).toString();
-  int mainFieldPairIndex = 0;
-
-  // for composite relations the config is forced with chain filters for additional fields
+  QStringList filterFields = config( QStringLiteral( "FilterFields" ) ).toStringList();
   bool chainedFilters = config( QStringLiteral( "ChainFilters" ) ).toBool();
-  QStringList filterFields;
+  QString displayExpression = config( QStringLiteral( "DisplayExpression" ) ).toString();
+
+
+  // for composite relation additional fields are set
+  // and display expression, if not defined, will be set to concatenate all referenced fields
+  QgsAttributeList additionalFieldIdxs;
+  QStringList fieldsForDisplayExpression;
   if ( relation.isValid() && relation.isComposite() )
   {
     chainedFilters = true;
     for ( int idx = 0; idx < relation.fieldPairs().count(); idx++ )
     {
-      if ( relation.fieldPairs().at( idx ).referencingField() == field().name() )
-      {
-        displayExpression = relation.fieldPairs().at( idx ).referencedField();
-        mainFieldPairIndex = idx;
+      QString fieldName = relation.fieldPairs().at( idx ).referencingField();
+      fieldsForDisplayExpression << QString( " \"%1\" " ).arg( fieldName );
+      if ( fieldName  == field().name() )
         continue;
-      }
 
-      filterFields << relation.fieldPairs().at( idx ).referencedField();
+      additionalFieldIdxs << idx;
     }
   }
-  else
+
+  if ( displayExpression.isEmpty() )
   {
-    filterFields = config( QStringLiteral( "FilterFields" ) ).toStringList();
+    if ( !fieldsForDisplayExpression.isEmpty() )
+      displayExpression = fieldsForDisplayExpression.join( " || ' ' || " );
+    else
+      displayExpression = relation.referencedLayer()->displayExpression();
   }
+
+  setAdditionalFields( additionalFieldIdxs );
 
   mWidget->setEmbedForm( showForm );
   mWidget->setReadOnlySelector( readOnlyWidget );
@@ -115,7 +122,7 @@ void QgsRelationReferenceWidgetWrapper::initWidget( QWidget *editor )
   }
   while ( ctx );
 
-  mWidget->setRelation( relation, allowNull, mainFieldPairIndex );
+  mWidget->setRelation( relation, allowNull );
 
   connect( mWidget, &QgsRelationReferenceWidget::foreignKeysChanged, this, &QgsRelationReferenceWidgetWrapper::foreignKeysChanged );
 }
@@ -151,13 +158,22 @@ void QgsRelationReferenceWidgetWrapper::showIndeterminateState()
   mIndeterminateState = true;
 }
 
-void QgsRelationReferenceWidgetWrapper::updateValues( const QVariant &val, const QgsAttributeMap & )
+QVariantMap QgsRelationReferenceWidgetWrapper::additionalFieldValues() const
+{
+  // TODO
+}
+
+void QgsRelationReferenceWidgetWrapper::updateValues( const QVariant &val, const QVariantMap &additionalValues )
 {
   if ( !mWidget || ( !mIndeterminateState && val == value() && val.isNull() == value().isNull() ) )
     return;
 
   mIndeterminateState = false;
-  mWidget->setForeignKey( val );
+
+  // append the main value to additional values to set foreign keys on relation reference widget
+  QVariantMap foreignKeyValues = additionalValues;
+  foreignKeyValues.insert( field().name(), val );
+  mWidget->setForeignKeys( foreignKeyValues );
 }
 
 void QgsRelationReferenceWidgetWrapper::setEnabled( bool enabled )
@@ -177,7 +193,7 @@ void QgsRelationReferenceWidgetWrapper::foreignKeysChanged( const QVariantList &
   else
   {
     // TODO
-    emit valuesChanged( foreignKeys, additionalValues );
+    //emit valuesChanged( foreignKeys, additionalValues );
   }
 }
 

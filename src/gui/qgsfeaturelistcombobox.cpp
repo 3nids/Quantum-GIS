@@ -1,5 +1,5 @@
 /***************************************************************************
-  qgsfieldlistcombobox.cpp - QgsFieldListComboBox
+  qgsfeaturelistcombobox.cpp - QgsFeatureListComboBox
 
  ---------------------
  begin                : 10.3.2017
@@ -75,6 +75,17 @@ void QgsFeatureListComboBox::setSourceLayer( QgsVectorLayer *sourceLayer )
   mModel->setSourceLayer( sourceLayer );
 }
 
+void QgsFeatureListComboBox::setCurrentFeature( const QgsFeature &feature )
+{
+  QVariantList values;
+  const QStringList fields = mModel->identifierFields();
+  for ( const QString &field : fields )
+  {
+    values << feature.attribute( field );
+  }
+  setCurrentIndex( findData( values, QgsFeatureFilterModel::Role::IdentifierValueRole ) );
+}
+
 QString QgsFeatureListComboBox::displayExpression() const
 {
   return mModel->displayExpression();
@@ -115,7 +126,7 @@ void QgsFeatureListComboBox::onCurrentIndexChanged( int i )
   if ( !mHasStoredEditState )
     mIsCurrentlyEdited = false;
   QModelIndex modelIndex = mModel->index( i, 0, QModelIndex() );
-  mModel->setExtraIdentifierValue( mModel->data( modelIndex, QgsFeatureFilterModel::IdentifierValueRole ) );
+  mModel->setExtraIdentifierValues( mModel->data( modelIndex, QgsFeatureFilterModel::IdentifierValuesRole ).toList() );
   mLineEdit->setText( mModel->data( modelIndex, QgsFeatureFilterModel::ValueRole ).toString() );
   mLineEdit->setFont( mModel->data( modelIndex, Qt::FontRole ).value<QFont>() );
   QPalette palette = mLineEdit->palette();
@@ -125,7 +136,7 @@ void QgsFeatureListComboBox::onCurrentIndexChanged( int i )
 
 void QgsFeatureListComboBox::onActivated( QModelIndex modelIndex )
 {
-  setIdentifierValue( mModel->data( modelIndex, QgsFeatureFilterModel::IdentifierValueRole ) );
+  setIdentifierValues( mModel->data( modelIndex, QgsFeatureFilterModel::IdentifierValuesRole ).toList() );
   mLineEdit->setText( mModel->data( modelIndex, QgsFeatureFilterModel::ValueRole ).toString() );
 }
 
@@ -153,6 +164,7 @@ int QgsFeatureListComboBox::nullIndex() const
 
   if ( allowNull() )
   {
+    // TODO
     index = findText( QgsApplication::nullRepresentation( ) );
   }
 
@@ -175,12 +187,26 @@ void QgsFeatureListComboBox::onDataChanged( const QModelIndex &topLeft, const QM
 
 QString QgsFeatureListComboBox::identifierField() const
 {
-  return mModel->identifierField();
+  QStringList list = mModel->identifierFields();
+  if ( list.isEmpty() )
+    return QString();
+  else
+    return list.at( 0 );
+}
+
+QStringList QgsFeatureListComboBox::identifierFields() const
+{
+  return mModel->identifierFields();
 }
 
 void QgsFeatureListComboBox::setIdentifierField( const QString &identifierField )
 {
-  mModel->setIdentifierField( identifierField );
+  mModel->setIdentifierFields( QStringList() << identifierField );
+}
+
+void QgsFeatureListComboBox::setIdentifierFields( const QStringList &identifierFields )
+{
+  mModel->setIdentifierFields( identifierFields );
 }
 
 QModelIndex QgsFeatureListComboBox::currentModelIndex() const
@@ -219,13 +245,24 @@ QVariant QgsFeatureListComboBox::identifierValue() const
   return mModel->extraIdentifierValue();
 }
 
+QVariantList QgsFeatureListComboBox::identifierValues() const
+{
+  return mModel->extraIdentifierValues();
+}
+
 void QgsFeatureListComboBox::setIdentifierValue( const QVariant &identifierValue )
 {
-  mModel->setExtraIdentifierValue( identifierValue );
+  setIdentifierValues( QVariantList() << identifierValue );
+}
+
+void QgsFeatureListComboBox::setIdentifierValues( const QVariantList &identifierValues )
+{
+  mModel->setExtraIdentifierValue( identifierValues );
 }
 
 QgsFeatureRequest QgsFeatureListComboBox::currentFeatureRequest() const
 {
+  // TODO
   if ( mModel->extraIdentifierValue().isNull() )
     return QgsFeatureRequest().setFilterFids( QgsFeatureIds() ); // NULL: Return a request that's guaranteed to not return anything
   else

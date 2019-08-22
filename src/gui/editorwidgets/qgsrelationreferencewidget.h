@@ -84,10 +84,8 @@ class GUI_EXPORT QgsRelationReferenceWidget : public QWidget
      * Sets the relation
      * \param relation The relation
      * \param allowNullValue Determines if user can set a NULL value
-     * \param mainFieldPairIndex If the relation is composite, determines which field pair
-     *        is the main one i.e. the one corresponding to the edited field index
      */
-    void setRelation( const QgsRelation &relation, bool allowNullValue, int mainFieldPairIndex = 0 );
+    void setRelation( const QgsRelation &relation, bool allowNullValue );
 
     void setRelationEditable( bool editable );
 
@@ -102,10 +100,19 @@ class GUI_EXPORT QgsRelationReferenceWidget : public QWidget
      * Sets the foreign keys
      * \since QGIS 3.10
      */
-    void setForeignKeys( const QVariantList &values );
+    void setForeignKeys( const QVariantMap &values );
 
-    //! returns the related feature foreign key
-    QVariant foreignKey() const;
+    /**
+    * returns the related feature foreign key
+    * \deprecated since QGIS 3.10
+    */
+    Q_DECL_DEPRECATED QVariant foreignKey() const;
+
+    /**
+    * returns the related feature foreign keys
+    * \since QGIS 3.10
+    */
+    QVariantList foreignKeys() const;
 
     void setEditorContext( const QgsAttributeEditorContext &context, QgsMapCanvas *canvas, QgsMessageBar *messageBar );
 
@@ -185,7 +192,7 @@ class GUI_EXPORT QgsRelationReferenceWidget : public QWidget
     void mapIdentification();
 
     //! unset the currently related feature
-    void deleteForeignKey();
+    void deleteForeignKeys();
 
   protected:
     void showEvent( QShowEvent *e ) override;
@@ -223,16 +230,17 @@ class GUI_EXPORT QgsRelationReferenceWidget : public QWidget
     void updateAttributeEditorFrame( const QgsFeature &feature );
     void disableChainedComboBoxes( const QComboBox *cb );
     void emitForeignKeyChanged( const QVariantList &foreignKeys );
+    void setLineEditTitle();
 
     // initialized
     QgsAttributeEditorContext mEditorContext;
     QgsMapCanvas *mCanvas = nullptr;
     QgsMessageBar *mMessageBar = nullptr;
-    QVariant mForeignKey;
+    QVariantList mForeignKeys;
     QgsFeature mFeature;
     // Index of the referenced layer key
-    int mReferencedFieldIdx = -1;
-    QString mReferencedField;
+    QList<int> mReferencedFieldIdxs;
+    QStringList mReferencedFields;
     bool mAllowNull = true;
     QString mDisplayExpression;
     QgsHighlight *mHighlight = nullptr;

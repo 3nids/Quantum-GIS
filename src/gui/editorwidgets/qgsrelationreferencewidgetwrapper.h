@@ -58,6 +58,7 @@ class GUI_EXPORT QgsRelationReferenceWidgetWrapper : public QgsEditorWidgetWrapp
     QVariant value() const override;
     bool valid() const override;
     void showIndeterminateState() override;
+    QVariantMap additionalFieldValues() const override;
 
   public slots:
     void setEnabled( bool enabled ) override;
@@ -69,7 +70,7 @@ class GUI_EXPORT QgsRelationReferenceWidgetWrapper : public QgsEditorWidgetWrapp
     void updateConstraintWidgetStatus() override;
 
   private:
-    void updateValues( const QVariant &val, const QgsAttributeMap & = QgsAttributeMap() ) override;
+    void updateValues( const QVariant &val, const QVariantMap &additionalValues = QVariantMap() ) override;
 
     QgsRelationReferenceWidget *mWidget = nullptr;
     QgsMapCanvas *mCanvas = nullptr;

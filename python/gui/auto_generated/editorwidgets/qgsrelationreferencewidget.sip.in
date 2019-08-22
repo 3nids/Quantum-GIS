@@ -43,14 +43,12 @@ class QgsRelationReferenceWidget : QWidget
 
     ~QgsRelationReferenceWidget();
 
-    void setRelation( const QgsRelation &relation, bool allowNullValue, int mainFieldPairIndex = 0 );
+    void setRelation( const QgsRelation &relation, bool allowNullValue );
 %Docstring
 Sets the relation
 
 :param relation: The relation
 :param allowNullValue: Determines if user can set a NULL value
-:param mainFieldPairIndex: If the relation is composite, determines which field pair
-                           is the main one i.e. the one corresponding to the edited field index
 %End
 
     void setRelationEditable( bool editable );
@@ -63,16 +61,25 @@ this sets the related feature using from the foreign key
 %End
 
 
-    void setForeignKeys( const QVariantList &values );
+    void setForeignKeys( const QVariantMap &values );
 %Docstring
 Sets the foreign keys
 
 .. versionadded:: 3.10
 %End
 
-    QVariant foreignKey() const;
+ QVariant foreignKey() const;
 %Docstring
 returns the related feature foreign key
+
+.. deprecated:: since QGIS 3.10
+%End
+
+    QVariantList foreignKeys() const;
+%Docstring
+returns the related feature foreign keys
+
+.. versionadded:: 3.10
 %End
 
     void setEditorContext( const QgsAttributeEditorContext &context, QgsMapCanvas *canvas, QgsMessageBar *messageBar );
@@ -173,7 +180,7 @@ open the form of the related feature in a new dialog
 activate the map tool to select a new related feature on the map
 %End
 
-    void deleteForeignKey();
+    void deleteForeignKeys();
 %Docstring
 unset the currently related feature
 %End

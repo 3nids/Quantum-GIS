@@ -70,7 +70,7 @@ bool QgsClassificationWidgetWrapper::valid() const
   return mComboBox;
 }
 
-void QgsClassificationWidgetWrapper::updateValues( const QVariant &value, const QgsAttributeMap & )
+void QgsClassificationWidgetWrapper::updateValues( const QVariant &value, const QVariantMap & )
 {
   mComboBox->setCurrentIndex( mComboBox->findData( value ) );
 }

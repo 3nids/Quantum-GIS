@@ -146,18 +146,18 @@ void QgsAttributeTableDelegate::setEditorData( QWidget *editor, const QModelInde
     if ( model )
     {
       QgsFeature feat = model->feature( index );
-      QgsAttributeMap additionalFieldValues;
+      QVariantMap additionalFieldValues;
       for ( int fieldIndex : additionalFields )
       {
-        const QVariant fieldValue = feat.attribute( fieldIndex );
-        additionalFieldValues.insert( fieldIndex, fieldValue );
+        QString fieldName = mLayer->fields().at( fieldIndex ).name();
+        additionalFieldValues.insert( fieldName, feat.attribute( fieldIndex ) );
       }
       eww->setValues( value, additionalFieldValues );
     }
   }
   else
   {
-    eww->setValues( value, QgsAttributeMap() );
+    eww->setValues( value, QVariantMap() );
   }
 }
 

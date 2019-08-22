@@ -51,6 +51,8 @@ Constructor for QgsRelationReferenceWidgetWrapper
 
     virtual void showIndeterminateState();
 
+    virtual QVariantMap additionalFieldValues() const;
+
 
   public slots:
     virtual void setEnabled( bool enabled );

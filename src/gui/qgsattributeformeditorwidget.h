@@ -121,12 +121,12 @@ class GUI_EXPORT QgsAttributeFormEditorWidget : public QgsAttributeFormWidget
      * \param value new widget value
      * \since QGIS 3.10
      */
-    void valuesChanged( const QVariant &value, const QgsAttributeMap &additionalFieldValues );
+    void valuesChanged( const QVariant &value, const QVariantMap &additionalFieldValues );
 
   private slots:
 
     //! Triggered when editor widget's value changes
-    void editorWidgetValuesChanged( const QVariant &value, const QgsAttributeMap &additionalFieldValues );
+    void editorWidgetValuesChanged(const QVariant &value, const QVariantMap &additionalFieldValues );
 
     //! Triggered when multi edit tool button requests value reset
     void resetValue();
