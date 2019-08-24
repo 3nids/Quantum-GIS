@@ -103,10 +103,7 @@ bool QgsFeatureFilterModel::isLoading() const
 
 QString QgsFeatureFilterModel::identifierField() const
 {
-  if ( mIdentifierFields.isEmpty() )
-    return QString();
-  else
-    return mIdentifierFields.at( 0 );
+  return mIdentifierFields.value( 0 );
 }
 
 QModelIndex QgsFeatureFilterModel::index( int row, int column, const QModelIndex &parent ) const
@@ -148,8 +145,8 @@ QVariant QgsFeatureFilterModel::data( const QModelIndex &index, int role ) const
 
     case IdentifierValueRole:
     {
-      QVariantList values = mEntries.value( index.row() ).identifierValues;
-      return values.isEmpty() ? QVariant() : values.at( 0 );
+      const QVariantList values = mEntries.value( index.row() ).identifierValues;
+      return values.value( 0 );
     }
 
     case IdentifierValuesRole:
@@ -161,7 +158,8 @@ QVariant QgsFeatureFilterModel::data( const QModelIndex &index, int role ) const
     case Qt::FontRole:
     {
       bool isNull = true;
-      for ( const QVariant &value : mEntries.value( index.row() ).identifierValues )
+      const QVariantList values = mEntries.value( index.row() ).identifierValues;
+      for ( const QVariant &value : values )
       {
         if ( !value.isNull() )
         {
@@ -218,7 +216,7 @@ void QgsFeatureFilterModel::updateCompleter()
   if ( mExtraIdentifierValueIndex == -1 )
   {
     QVariantList nullAttributes;
-    for ( const QString &fieldName : mIdentifierFields )
+    for ( const QString &fieldName : qgis::as_const( mIdentifierFields ) )
     {
       int idx = mSourceLayer->fields().indexOf( fieldName );
       nullAttributes << QVariant( mSourceLayer->fields().at( idx ).type() );
@@ -632,7 +630,7 @@ void QgsFeatureFilterModel::setExtraIdentifierValuesToNull()
   QVariantList nullAttributes;
   if ( mSourceLayer )
   {
-    for ( const QString &fieldName : mIdentifierFields )
+    for ( const QString &fieldName : qgis::as_const( mIdentifierFields ) )
     {
       int idx = mSourceLayer->fields().indexOf( fieldName );
       Q_ASSERT( idx >= 0 );
