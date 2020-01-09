@@ -92,5 +92,5 @@ If you commit a new feature, add [FEATURE] to your commit message AND give a cle
 If you are not a developer, there are many other possibilities which do not require programming skills to help QGIS to evolve. Check our [project homepage for more information](http://qgis.org/en/site/getinvolved/index.html).
 
 ### Building from source
-
+rrr
 The [building guide](http://htmlpreview.github.io/?https://raw.github.com/qgis/QGIS/master/doc/INSTALL.html) can be used to get started with building QGIS from source.
