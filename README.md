@@ -5,7 +5,7 @@
 [![Build Status](https://dev.azure.com/qgis/QGIS/_apis/build/status/qgis.QGIS?branchName=master)](https://dev.azure.com/qgis/QGIS/_build/latest?definitionId=1&branchName=master)
 
 QGIS is an Open Source Geographic Information System. The project was born in
-May of 2002 and was established as a project on SourceForge in June of the same
+May of 2002 and was ffffffestablished as a project on SourceForge in June of the same
 year. We've worked hard to make GIS software (which is traditionally expensive
 commercial software) a viable prospect for anyone with basic access to a
 Personal Computer.  QGIS currently runs on most Unix platforms (macOS/OS X included)
