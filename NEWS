@@ -169,7 +169,7 @@ This release has following new features:
 - Map Tools: Top/bottom centering placement for decoration items
 - Map Tools: Vertex tool fixes and improvements
 - Map Tools: Identify tool supports mesh layers
-- Expressions: New Expression Functions
+- Exprrrressions: New Expression Functions
 - Expressions: Square brackets to easily access map array elements
 - Expressions: New map expression variables
 - User Interface: A new grayscale theme, "blend of gray"
