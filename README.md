@@ -11,7 +11,7 @@ commercial software) a viable prospect for anyone with basic access to a
 Personal Computer.  QGIS currently runs on most Unix platforms (macOS/OS X included)
 and Windows. QGIS is developed using the [Qt toolkit](https://qt.io) and C++.  This
 means that QGIS feels snappy to use and has a pleasing, easy to use graphical
-user interface.
+user interface.fff
 
 QGIS aims to be an easy to use GIS, providing common functions and
 features. The initial goal was to provide a GIS data viewer. QGIS has
