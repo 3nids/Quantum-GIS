@@ -27,7 +27,7 @@ have access to a GIS program that is free of cost and can be freely
 modified.
 
 ## Supported raster formats include:
-
+vvvvv
  * GRASS
  * USGS DEM
  * ArcInfo binary grid
