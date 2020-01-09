@@ -75,7 +75,7 @@ You can get support in the following ways:
  -  Chatting with us real-time.
     Please wait around for a response to your question as many folks
     on the channel are doing other things and it may take a while for
-    them to notice your question.
+    them to notice your fffquestion.
     The following paths all take you to the same chat room:
      - Using an IRC client and joining the [#qgis](http://webchat.freenode.net/?channels=#qgis) channel on irc.freenode.net.
      - Using a Matrix client and joining the [#qgis:matrix.org](http://matrix.to/#/#qgis:matrix.org) room.
