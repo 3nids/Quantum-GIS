@@ -30,7 +30,7 @@ QgsRelationReferenceConfigDlg::QgsRelationReferenceConfigDlg( QgsVectorLayer *vl
   connect( mAddFilterButton, &QToolButton::clicked, this, &QgsRelationReferenceConfigDlg::mAddFilterButton_clicked );
   connect( mRemoveFilterButton, &QToolButton::clicked, this, &QgsRelationReferenceConfigDlg::mRemoveFilterButton_clicked );
 
-  mExpressionWidget->registerExpressionContextGenerator( vl );
+  mCustomExpressionWidget->registerExpressionContextGenerator( vl );
 
   connect( mComboRelation, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ), this, &QgsRelationReferenceConfigDlg::relationChanged );
 
@@ -43,7 +43,7 @@ QgsRelationReferenceConfigDlg::QgsRelationReferenceConfigDlg( QgsVectorLayer *vl
       mComboRelation->addItem( QStringLiteral( "%1 (%2)" ).arg( relation.name(), relation.referencedLayerId() ), relation.id() );
     if ( relation.referencedLayer() )
     {
-      mExpressionWidget->setField( relation.referencedLayer()->displayExpression() );
+      mLayerExpressionWidget->setText( relation.referencedLayer()->displayExpression() );
     }
   }
 
@@ -58,7 +58,7 @@ QgsRelationReferenceConfigDlg::QgsRelationReferenceConfigDlg( QgsVectorLayer *vl
   connect( mFilterGroupBox, &QGroupBox::toggled, this, &QgsEditorConfigWidget::changed );
   connect( mFilterFieldsList, &QListWidget::itemChanged, this, &QgsEditorConfigWidget::changed );
   connect( mCbxChainFilters, &QAbstractButton::toggled, this, &QgsEditorConfigWidget::changed );
-  connect( mExpressionWidget, static_cast<void ( QgsFieldExpressionWidget::* )( const QString & )>( &QgsFieldExpressionWidget::fieldChanged ), this, &QgsEditorConfigWidget::changed );
+  connect( mCustomExpressionWidget, static_cast<void ( QgsFieldExpressionWidget::* )( const QString & )>( &QgsFieldExpressionWidget::fieldChanged ), this, &QgsEditorConfigWidget::changed );
 }
 
 void QgsRelationReferenceConfigDlg::setConfig( const QVariantMap &config )
@@ -89,6 +89,10 @@ void QgsRelationReferenceConfigDlg::setConfig( const QVariantMap &config )
 
     mCbxChainFilters->setChecked( config.value( QStringLiteral( "ChainFilters" ) ).toBool() );
   }
+
+  QString customDisplayExpression = config.value( QStringLiteral( "CustomDisplayExpression" ) ).toString();
+  mCustomExpressionButton->setChecked( !customDisplayExpression.isEmpty() );
+  mCustomExpressionWidget->setExpression( customDisplayExpression );
 }
 
 void QgsRelationReferenceConfigDlg::relationChanged( int idx )
@@ -97,11 +101,15 @@ void QgsRelationReferenceConfigDlg::relationChanged( int idx )
   QgsRelation rel = QgsProject::instance()->relationManager()->relation( relName );
 
   mReferencedLayer = rel.referencedLayer();
-  mExpressionWidget->setLayer( mReferencedLayer ); // set even if 0
+  mCustomExpressionWidget->setLayer( mReferencedLayer ); // set even if 0
   if ( mReferencedLayer )
   {
-    mExpressionWidget->setField( mReferencedLayer->displayExpression() );
+    mLayerExpressionWidget->setText( mReferencedLayer->displayExpression() );
     mCbxMapIdentification->setEnabled( mReferencedLayer->isSpatial() );
+  }
+  else
+  {
+    mLayerExpressionWidget->clear();
   }
 
   loadFields();
@@ -137,6 +145,7 @@ QVariantMap QgsRelationReferenceConfigDlg::config()
   myConfig.insert( QStringLiteral( "ReadOnly" ), mCbxReadOnly->isChecked() );
   myConfig.insert( QStringLiteral( "Relation" ), mComboRelation->currentData() );
   myConfig.insert( QStringLiteral( "AllowAddFeatures" ), mCbxAllowAddFeatures->isChecked() );
+  myConfig.insert( QStringLiteral( "CustomDisplayExpression" ), mCustomExpressionButton->isChecked() ? mCustomExpressionWidget->expression() : QString() );
 
   if ( mFilterGroupBox->isChecked() )
   {
@@ -158,7 +167,6 @@ QVariantMap QgsRelationReferenceConfigDlg::config()
     myConfig.insert( QStringLiteral( "ReferencedLayerProviderKey" ), mReferencedLayer->providerType() );
     myConfig.insert( QStringLiteral( "ReferencedLayerId" ), mReferencedLayer->id() );
     myConfig.insert( QStringLiteral( "ReferencedLayerName" ), mReferencedLayer->name() );
-    mReferencedLayer->setDisplayExpression( mExpressionWidget->currentField() );
   }
 
   return myConfig;
