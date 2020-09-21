@@ -1340,6 +1340,10 @@ void QgsMapCanvas::zoomToFeatureIds( QgsVectorLayer *layer, const QgsFeatureIds 
   QString errorMsg;
   if ( boundingBoxOfFeatureIds( ids, layer, bbox, errorMsg ) )
   {
+    if ( bbox.isEmpty() )
+    {
+      bbox = optimalExtentForPointLayer( layer, bbox.center() );
+    }
     zoomToFeatureExtent( bbox );
   }
   else
