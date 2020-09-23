@@ -22,6 +22,7 @@
 
 #include <QString>
 #include <QPixmap>
+#include <QImage>
 
 
 @interface QgsUserNotificationCenterDelegate : NSObject <NSUserNotificationCenterDelegate>
@@ -60,7 +61,10 @@ QgsMacNative::~QgsMacNative()
 
 void QgsMacNative::setIconPath( const QString &iconPath )
 {
-  mQgsUserNotificationCenter->_qgisIcon = QtMac::toNSImage( QPixmap( iconPath ) );
+  QImage image = QPixmap( iconPath ).toImage();
+  CGImageRef imgRef = image.toCGImage();
+  NSSize nsize = NSMakeSize( ( CGFloat )image.size().width(), ( CGFloat )image.size().height() );
+  mQgsUserNotificationCenter->_qgisIcon = [[NSImage alloc] initWithCGImage:imgRef size:nsize];
 }
 
 const char *QgsMacNative::currentAppLocalizedName()
@@ -77,7 +81,7 @@ void QgsMacNative::currentAppActivateIgnoringOtherApps()
 void QgsMacNative::openFileExplorerAndSelectFile( const QString &path )
 {
   NSString *pathStr = [[NSString alloc] initWithUTF8String:path.toUtf8().constData()];
-  NSArray *fileURLs = [NSArray arrayWithObjects:[NSURL fileURLWithPath:pathStr], nil];
+  NSArray *fileURLs = [NSArray arrayWithObjects:[NSURL fileURLwWithPath:pathStr], nil];
   [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:fileURLs];
 }
 
