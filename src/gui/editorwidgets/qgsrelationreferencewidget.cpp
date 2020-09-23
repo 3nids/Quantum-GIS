@@ -54,7 +54,7 @@ bool qVariantListIsNull( const QVariantList &list )
 
   for ( int i = 0; i < list.size(); ++i )
   {
-    if ( !list.at( i ).isNull() )
+    if ( !list.at( i ).isNull() && list.at( i ).isValid() )
       return false;
   }
   return true;
@@ -730,7 +730,7 @@ void QgsRelationReferenceWidget::comboReferenceChanged( int index )
   highlightFeature( mFeature );
   updateAttributeEditorFrame( mFeature );
 
-  emitForeignKeysChanged( mComboBox->identifierValues(), true );
+  emitForeignKeysChanged( mComboBox->identifierValues() );
 }
 
 void QgsRelationReferenceWidget::updateAttributeEditorFrame( const QgsFeature &feature )
@@ -1074,7 +1074,7 @@ void QgsRelationReferenceWidget::disableChainedComboBoxes( const QComboBox *scb 
 
 void QgsRelationReferenceWidget::emitForeignKeysChanged( const QVariantList &foreignKeys, bool force )
 {
-  if ( foreignKeys == mForeignKeys && force == false )
+  if ( foreignKeys == mForeignKeys && force == false && qVariantListIsNull( foreignKeys ) == qVariantListIsNull( mForeignKeys ) )
     return;
 
   mForeignKeys = foreignKeys;
