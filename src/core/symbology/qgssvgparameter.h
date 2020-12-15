@@ -23,7 +23,7 @@
 
 /**
 \ingroup core
-A simple class to hold informations for SVG dynamic parameters
+A simple class to hold information for SVG dynamic parameters
 \since QGIS 3.18
 */
 class CORE_EXPORT QgsSvgParameter

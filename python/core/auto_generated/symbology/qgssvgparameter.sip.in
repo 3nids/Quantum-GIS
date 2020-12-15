@@ -12,7 +12,7 @@
 class QgsSvgParameter
 {
 %Docstring
-A simple class to hold informations for SVG dynamic parameters
+A simple class to hold information for SVG dynamic parameters
 
 .. versionadded:: 3.18
 %End
