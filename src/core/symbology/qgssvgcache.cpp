@@ -601,7 +601,7 @@ void QgsSvgCache::replaceElemParams( QDomElement &elem, const QColor &fill, cons
         QMap<QString, QString>::const_iterator paramIt = parameters.constBegin();
         for ( ; paramIt != parameters.constEnd(); ++paramIt )
         {
-          if ( value.startsWith( QLatin1String( "param(%1)" ).arg( paramIt.key() ) ) )
+          if ( value.startsWith( QString( QLatin1String( "param(%1)" ) ).arg( paramIt.key() ) ) )
           {
             elem.setAttribute( attribute.name(), paramIt.value() );
             break;
@@ -616,7 +616,7 @@ void QgsSvgCache::replaceElemParams( QDomElement &elem, const QColor &fill, cons
     QMap<QString, QString>::const_iterator paramIt = parameters.constBegin();
     for ( ; paramIt != parameters.constEnd(); ++paramIt )
     {
-      if ( elem.nodeValue().startsWith( QLatin1String( "param(%1)" ).arg( paramIt.key() ) ) )
+      if ( elem.nodeValue().startsWith( QString( QLatin1String( "param(%1)" ) ).arg( paramIt.key() ) ) )
       {
         elem.setNodeValue( paramIt.value() );
         break;
