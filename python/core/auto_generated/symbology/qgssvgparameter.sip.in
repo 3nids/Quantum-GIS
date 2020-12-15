@@ -22,8 +22,14 @@ A simple class to hold information for SVG dynamic parameters
 %End
   public:
     QgsSvgParameter();
+%Docstring
+Constructor
+%End
 
     QgsSvgParameter( const QString &name, const QString &value );
+%Docstring
+Constructor
+%End
     QString name() const;
 %Docstring
 Returns the name of the parameter

@@ -29,8 +29,10 @@ A simple class to hold information for SVG dynamic parameters
 class CORE_EXPORT QgsSvgParameter
 {
   public:
+    //! Constructor
     QgsSvgParameter() = default;
 
+    //! Constructor
     QgsSvgParameter( const QString &name, const QString &value )
       : mValid( !name.isEmpty() ), mName( name ), mValue( value ) {}
 
