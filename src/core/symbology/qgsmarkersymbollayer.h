@@ -585,7 +585,16 @@ class CORE_EXPORT QgsSvgMarkerSymbolLayer : public QgsMarkerSymbolLayer
     double strokeWidth() const { return mStrokeWidth; }
     void setStrokeWidth( double w ) { mStrokeWidth = w; }
 
+    /**
+     * Returns the dynamic SVG parameters
+     * \since QGIS 3.18
+     */
     QgsSvgParameters parameters() const { return mParameters; }
+
+    /**
+     * Sets the dynamic SVG parameters
+     * \since QGIS 3.18
+     */
     void setParameters( const QgsSvgParameters &parameters ) { mParameters = parameters; }
 
     /**

@@ -8,6 +8,7 @@
 
 
 
+
 class QgsSvgParameter
 {
 %Docstring
@@ -24,9 +25,21 @@ A simple class to hold informations for SVG dynamic parameters
 
     QgsSvgParameter( const QString &name, const QString &value );
     QString name() const;
+%Docstring
+Returns the name of the parameter
+%End
     void setName( const QString &name );
+%Docstring
+Sets the name of the parameter
+%End
     QString value() const;
+%Docstring
+Returns the value of the parameter
+%End
     void setValue( const QString &value );
+%Docstring
+Sets the value of the parameter
+%End
 
 };
 
