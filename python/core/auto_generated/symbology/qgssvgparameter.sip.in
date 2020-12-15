@@ -1,0 +1,41 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/core/symbology/qgssvgparameter.h                                 *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+class QgsSvgParameter
+{
+%Docstring
+A simple class to hold informations for SVG dynamic parameters
+
+.. versionadded:: 3.18
+%End
+
+%TypeHeaderCode
+#include "qgssvgparameter.h"
+%End
+  public:
+    QgsSvgParameter();
+
+    QgsSvgParameter( const QString &name, const QString &value );
+    QString name() const;
+    void setName( const QString &name );
+    QString value() const;
+    void setValue( const QString &value );
+
+};
+
+typedef QList<QgsSvgParameter> QgsSvgParameters;
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/core/symbology/qgssvgparameter.h                                 *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

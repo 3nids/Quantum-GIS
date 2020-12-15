@@ -19,6 +19,7 @@
 #include "qgis_core.h"
 #include "qgis_sip.h"
 #include "qgssymbollayer.h"
+#include "qgssvgparameter.h"
 
 #define DEFAULT_SIMPLEMARKER_NAME         "circle"
 #define DEFAULT_SIMPLEMARKER_COLOR        QColor(255,0,0)
@@ -584,6 +585,9 @@ class CORE_EXPORT QgsSvgMarkerSymbolLayer : public QgsMarkerSymbolLayer
     double strokeWidth() const { return mStrokeWidth; }
     void setStrokeWidth( double w ) { mStrokeWidth = w; }
 
+    QgsSvgParameters parameters() const { return mParameters; }
+    void setParameters( const QgsSvgParameters &parameters ) { mParameters = parameters; }
+
     /**
      * Sets the units for the stroke width.
      * \param unit width units
@@ -631,6 +635,7 @@ class CORE_EXPORT QgsSvgMarkerSymbolLayer : public QgsMarkerSymbolLayer
     bool mHasFillParam = false;
     QColor mStrokeColor;
     double mStrokeWidth;
+    QList<QgsSvgParameter> mParameters;
 
     QgsUnitTypes::RenderUnit mStrokeWidthUnit;
     QgsMapUnitScale mStrokeWidthMapUnitScale;
