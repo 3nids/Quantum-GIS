@@ -898,7 +898,7 @@ It expects
 which will return
 {"key1": "value1", "key2": "value2"}
 
-.. seealso:: :py:func:`serializedProperties`
+.. seealso:: :py:func:`serializeProperties`
 
 .. versionadded:: 3.18
 %End

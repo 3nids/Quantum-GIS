@@ -807,7 +807,7 @@ class CORE_EXPORT QgsSymbolLayerUtils
      * }
      * which will return
      * {"key1": "value1", "key2": "value2"}
-     * \see serializedProperties
+     * \see serializeProperties
      * \since QGIS 3.18
      */
     static QMap<QString, QgsProperty> readSerializedProperties( const QMap<QString, QString> &serializedProperties );
