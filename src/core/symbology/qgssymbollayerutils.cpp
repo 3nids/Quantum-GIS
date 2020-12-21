@@ -4742,22 +4742,39 @@ QgsStringMap QgsSymbolLayerUtils::evaluatePropertiesMap( const QMap<QString, Qgs
   return properties;
 }
 
-QMap<QString, QString> QgsSymbolLayerUtils::serializeProperties( const QMap<QString, QgsProperty> &propertiesMap )
+QMap<QString, QVariant> QgsSymbolLayerUtils::serializeProperties( const QMap<QString, QgsProperty> &propertiesMap )
 {
-  QMap<QString, QString> serialized;
+  /*
+   {"key1": "value1", "key2": "value2"}
+   becomes
+   {
+     "properties_0_name": "key1", "properties_0_value": "value1",
+     "properties_1_name": "key2", "properties_1_value": "value2",
+   }
+   */
+  QMap<QString, QVariant> serialized;
   QMap<QString, QgsProperty>::const_iterator paramIt = propertiesMap.constBegin();
   int i = 0;
   for ( ; paramIt != propertiesMap.constEnd(); ++paramIt )
   {
     serialized[QString( QStringLiteral( "properties_%1_name" ) ).arg( i )] = paramIt.key();
-    serialized[QString( QStringLiteral( "properties_%1_value" ) ).arg( i )] = paramIt.value().expressionString();
+    serialized[QString( QStringLiteral( "properties_%1_value" ) ).arg( i )] = paramIt.value().toVariant();
     i++;
   }
   return serialized;
 }
 
-QMap<QString, QgsProperty> QgsSymbolLayerUtils::readSerializedProperties( const QMap<QString, QString> &serializedProperties )
+QMap<QString, QgsProperty> QgsSymbolLayerUtils::readSerializedProperties( const QMap<QString, QVariant> &serializedProperties )
 {
+  /*
+  It expects
+  {
+    "properties_0_name": "key1", "properties_0_value": "value1",
+    "properties_1_name": "key2", "properties_1_value": "value2",
+  }
+  which will return
+  {"key1": "value1", "key2": "value2"}
+  */
   QMap<QString, QgsProperty> properties;
   int i = 0;
   while ( true )
@@ -4765,8 +4782,9 @@ QMap<QString, QgsProperty> QgsSymbolLayerUtils::readSerializedProperties( const 
     if ( !serializedProperties.contains( QString( QStringLiteral( "properties_%1_name" ) ).arg( i ) ) )
       break;
 
-    properties.insert( serializedProperties.value( QString( QStringLiteral( "properties_%1_name" ) ).arg( i ) ),
-                       QgsProperty::fromExpression( serializedProperties.value( QString( QStringLiteral( "properties_%1_value" ) ).arg( i ) ) ) );
+    QgsProperty p;
+    p.loadVariant( serializedProperties.value( QString( QStringLiteral( "properties_%1_value" ) ).arg( i ) ) );
+    properties.insert( serializedProperties.value( QString( QStringLiteral( "properties_%1_name" ) ).arg( i ) ).toString(), p );
     i++;
   }
   return properties;
