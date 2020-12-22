@@ -253,7 +253,7 @@ QSet<QString> QgsSymbolLayer::usedAttributes( const QgsRenderContext &context ) 
   return columns;
 }
 
-QgsProperty propertyFromMap( const QgsStringMap &map, const QString &baseName )
+QgsProperty propertyFromMap( const QVariantMap &map, const QString &baseName )
 {
   QString prefix;
   if ( !baseName.isEmpty() )
@@ -268,9 +268,9 @@ QgsProperty propertyFromMap( const QgsStringMap &map, const QString &baseName )
   }
 
   bool active = ( map.value( QStringLiteral( "%1active" ).arg( prefix ), QStringLiteral( "1" ) ) != QLatin1String( "0" ) );
-  QString expression = map.value( QStringLiteral( "%1expression" ).arg( prefix ) );
+  QString expression = map.value( QStringLiteral( "%1expression" ).arg( prefix ) ).toString();
   bool useExpression = ( map.value( QStringLiteral( "%1useexpr" ).arg( prefix ), QStringLiteral( "1" ) ) != QLatin1String( "0" ) );
-  QString field = map.value( QStringLiteral( "%1field" ).arg( prefix ), QString() );
+  QString field = map.value( QStringLiteral( "%1field" ).arg( prefix ), QString() ).toString();
 
   if ( useExpression )
     return QgsProperty::fromExpression( expression, active );
@@ -278,7 +278,7 @@ QgsProperty propertyFromMap( const QgsStringMap &map, const QString &baseName )
     return QgsProperty::fromField( field, active );
 }
 
-void QgsSymbolLayer::restoreOldDataDefinedProperties( const QgsStringMap &stringMap )
+void QgsSymbolLayer::restoreOldDataDefinedProperties( const QVariantMap &stringMap )
 {
   // property string to type upgrade map
   static const QMap< QString, QgsSymbolLayer::Property > OLD_PROPS
@@ -356,7 +356,7 @@ void QgsSymbolLayer::restoreOldDataDefinedProperties( const QgsStringMap &string
     { "vertical_anchor_point", QgsSymbolLayer::PropertyVerticalAnchor },
   };
 
-  QgsStringMap::const_iterator propIt = stringMap.constBegin();
+  QVariantMap::const_iterator propIt = stringMap.constBegin();
   for ( ; propIt != stringMap.constEnd(); ++propIt )
   {
     QgsProperty prop;
@@ -378,7 +378,7 @@ void QgsSymbolLayer::restoreOldDataDefinedProperties( const QgsStringMap &string
       //get data defined property name by stripping "_expression" from property key
       propertyName = propIt.key().left( propIt.key().length() - 11 );
 
-      prop = QgsProperty::fromExpression( propIt.value() );
+      prop = QgsProperty::fromExpression( propIt.value().toString() );
     }
 
     if ( !prop || !OLD_PROPS.contains( propertyName ) )
