@@ -112,8 +112,17 @@ class CORE_EXPORT QgsAttributeEditorElement SIP_ABSTRACT
      * \param doc The QDomDocument which is used to create new XML elements
      *
      * \returns A DOM element to serialize this element
+     *
+     * \deprecated since QGIS 3.18 use configuration() with QgsXmlUtils::writeVariant() instead
      */
-    QDomElement toDomElement( QDomDocument &doc ) const;
+    Q_DECL_DEPRECATED QDomElement toDomElement( QDomDocument &doc ) const SIP_DEPRECATED;
+
+    /**
+     * Returns the configuration as a variant map
+     *
+     * \since QGIS 3.18
+     */
+    QVariantMap configuration() const;
 
     /**
      * Returns a clone of this element. To be implemented by subclasses.
@@ -135,37 +144,31 @@ class CORE_EXPORT QgsAttributeEditorElement SIP_ABSTRACT
      */
     void setShowLabel( bool showLabel );
 
-    /**
-     * Returns the editor configuration
-     *
-     * \since QGIS 3.18
-     */
-    QVariantMap config() const;
-
-    /**
-     * Sets the editor configuration
-     *
-     * \since QGIS 3.18
-     */
-    void setConfig( const QVariantMap &config );
-
   protected:
 #ifndef SIP_RUN
     AttributeEditorType mType;
     QString mName;
     QgsAttributeEditorElement *mParent = nullptr;
     bool mShowLabel;
-    QVariantMap mConfig;
 #endif
 
   private:
 
     /**
+     * Should be implemented by subclasses to return type specific configuration as a variant map
+     *
+     * \since QGIS 3.18
+     */
+    virtual QVariantMap specificConfiguration() const = 0;
+
+    /**
      * Should be implemented by subclasses to save type specific configuration.
      *
      * \since QGIS 2.18
+     *
+     * \deprecated since QGIS 3.18 use specificConfiguration()
      */
-    virtual void saveConfiguration( QDomElement &elem ) const = 0;
+    Q_DECL_DEPRECATED virtual void saveConfiguration( QDomElement &elem ) const {Q_UNUSED( elem )}
 
     /**
      * All subclasses need to overwrite this method and return a type specific identifier.
@@ -299,7 +302,8 @@ class CORE_EXPORT QgsAttributeEditorContainer : public QgsAttributeEditorElement
     void setBackgroundColor( const QColor &backgroundColor );
 
   private:
-    void saveConfiguration( QDomElement &elem ) const override;
+    QVariantMap specificConfiguration() const override;
+    Q_DECL_DEPRECATED void saveConfiguration( QDomElement &elem ) const override;
     QString typeIdentifier() const override;
 
     bool mIsGroupBox;
@@ -337,7 +341,8 @@ class CORE_EXPORT QgsAttributeEditorField : public QgsAttributeEditorElement
     QgsAttributeEditorElement *clone( QgsAttributeEditorElement *parent ) const override SIP_FACTORY;
 
   private:
-    void saveConfiguration( QDomElement &elem ) const override;
+    QVariantMap specificConfiguration() const override;
+    Q_DECL_DEPRECATED void saveConfiguration( QDomElement &elem ) const override;
     QString typeIdentifier() const override;
     int mIdx;
 };
@@ -480,8 +485,23 @@ class CORE_EXPORT QgsAttributeEditorRelation : public QgsAttributeEditorElement
      */
     void setRelationWidgetTypeId( const QString &relationWidgetTypeId );
 
+    /**
+     * Returns the reltion editor configuration
+     *
+     * \since QGIS 3.18
+     */
+    QVariantMap relationEditorConfiguration() const;
+
+    /**
+     * Sets the relation editor configuration
+     *
+     * \since QGIS 3.18
+     */
+    void setRelationEditorConfiguration( const QVariantMap &config );
+
   private:
-    void saveConfiguration( QDomElement &elem ) const override;
+    QVariantMap specificConfiguration() const override;
+    Q_DECL_DEPRECATED void saveConfiguration( QDomElement &elem ) const override;
     QString typeIdentifier() const override;
     QString mRelationId;
     QgsRelation mRelation;
@@ -490,6 +510,7 @@ class CORE_EXPORT QgsAttributeEditorRelation : public QgsAttributeEditorElement
     QVariant mNmRelationId;
     QString mLabel;
     QString mRelationWidgetTypeId;
+    QVariantMap mRelationEditorConfig;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QgsAttributeEditorRelation::Buttons )
@@ -530,7 +551,8 @@ class CORE_EXPORT QgsAttributeEditorQmlElement : public QgsAttributeEditorElemen
     void setQmlCode( const QString &qmlCode );
 
   private:
-    void saveConfiguration( QDomElement &elem ) const override;
+    QVariantMap specificConfiguration( ) const override;
+    Q_DECL_DEPRECATED void saveConfiguration( QDomElement &elem ) const override;
     QString typeIdentifier() const override;
     QString mQmlCode;
 };
@@ -571,7 +593,8 @@ class CORE_EXPORT QgsAttributeEditorHtmlElement : public QgsAttributeEditorEleme
     void setHtmlCode( const QString &htmlCode );
 
   private:
-    void saveConfiguration( QDomElement &elem ) const override;
+    QVariantMap specificConfiguration( ) const override;
+    Q_DECL_DEPRECATED void saveConfiguration( QDomElement &elem ) const override;
     QString typeIdentifier() const override;
     QString mHtmlCode;
 };

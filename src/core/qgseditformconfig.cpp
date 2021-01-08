@@ -544,15 +544,24 @@ void QgsEditFormConfig::writeXml( QDomNode &node, const QgsReadWriteContext &con
   {
     QDomElement tabsElem = doc.createElement( QStringLiteral( "attributeEditorForm" ) );
 
-    QDomElement rootElem = d->mInvisibleRootContainer->toDomElement( doc );
-    QDomNodeList elemList = rootElem.childNodes();
+    QDomElement configV2 = QgsXmlUtils::writeVariant( d->mInvisibleRootContainer->configuration(), doc );
+    tabsElem.appendChild( configV2 );
 
+    // Backward compatibility so newer project can open on QGIS <= 3.16
+    // TODO QGIS 4 before (or at next LTR 3.22)
+
+    Q_NOWARN_DEPRECATED_PUSH
+    QDomElement rootElem = d->mInvisibleRootContainer->toDomElement( doc );
+    Q_NOWARN_DEPRECATED_POP
+
+    QDomNodeList elemList = rootElem.childNodes();
     while ( !elemList.isEmpty() )
     {
       tabsElem.appendChild( elemList.at( 0 ) );
     }
-
     node.appendChild( tabsElem );
+
+    // --- end of backward compatibility
   }
 
   QDomElement editableElem = doc.createElement( QStringLiteral( "editable" ) );
@@ -665,7 +674,7 @@ QgsAttributeEditorElement *QgsEditFormConfig::attributeEditorElementFromDomEleme
 
     // load defaults
     if ( config.isEmpty() )
-      config = relElement->config();
+      config = relElement->relationEditorConfiguration();
 
     // pre QGIS 3.18 compatibility
     if ( ! config.contains( QStringLiteral( "buttons" ) ) )
@@ -686,7 +695,7 @@ QgsAttributeEditorElement *QgsEditFormConfig::attributeEditorElementFromDomEleme
       }
     }
 
-    relElement->setConfig( config );
+    relElement->setRelationEditorConfiguration( config );
 
     if ( elem.hasAttribute( QStringLiteral( "forceSuppressFormPopup" ) ) )
     {

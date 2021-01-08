@@ -107,6 +107,25 @@ QgsAttributeEditorElement *QgsAttributeEditorContainer::clone( QgsAttributeEdito
   return element;
 }
 
+QVariantMap QgsAttributeEditorContainer::specificConfiguration() const
+{
+  QVariantMap configuration;
+  configuration[QStringLiteral( "columnCount" )] = mColumnCount;
+  configuration[QStringLiteral( "groupBox" ) ] = mIsGroupBox ? 1 : 0;
+  configuration[QStringLiteral( "visibilityExpressionEnabled" ) ] = mVisibilityExpression.enabled() ? 1 : 0;
+  configuration[QStringLiteral( "visibilityExpression" ) ] = mVisibilityExpression->expression();
+  if ( mBackgroundColor.isValid() )
+    configuration[QStringLiteral( "backgroundColor" ) ] = mBackgroundColor.name( );
+
+  QVariantList childrenConfigs;
+  for ( QgsAttributeEditorElement *child : qgis::as_const( mChildren ) )
+  {
+    childrenConfigs << child->configuration();
+  }
+  configuration[QStringLiteral( "children" ) ] = childrenConfigs;
+  return configuration;
+}
+
 void QgsAttributeEditorContainer::saveConfiguration( QDomElement &elem ) const
 {
   elem.setAttribute( QStringLiteral( "columnCount" ), mColumnCount );
@@ -153,6 +172,13 @@ QgsAttributeEditorElement *QgsAttributeEditorRelation::clone( QgsAttributeEditor
 
   return element;
 }
+QVariantMap QgsAttributeEditorField::specificConfiguration( ) const
+{
+  QVariantMap configuration;
+  configuration[QStringLiteral( "index" )] = mIdx;
+  return configuration;
+}
+
 void QgsAttributeEditorField::saveConfiguration( QDomElement &elem ) const
 {
   elem.setAttribute( QStringLiteral( "index" ), mIdx );
@@ -168,13 +194,17 @@ QDomElement QgsAttributeEditorElement::toDomElement( QDomDocument &doc ) const
   QDomElement elem = doc.createElement( typeIdentifier() );
   elem.setAttribute( QStringLiteral( "name" ), mName );
   elem.setAttribute( QStringLiteral( "showLabel" ), mShowLabel );
-
-  QDomElement elemConfig = QgsXmlUtils::writeVariant( mConfig, doc );
-  elemConfig.setTagName( QStringLiteral( "config" ) );
-  elem.appendChild( elemConfig );
-
   saveConfiguration( elem );
   return elem;
+}
+
+QVariantMap QgsAttributeEditorElement::configuration( ) const
+{
+  QVariantMap configuration;
+  configuration[ QStringLiteral( "name" )] = mName ;
+  configuration[ QStringLiteral( "showLabel" )] = mShowLabel ;
+  configuration[ QStringLiteral( "configuration" )] = specificConfiguration();
+  return configuration;
 }
 
 bool QgsAttributeEditorElement::showLabel() const
@@ -187,24 +217,34 @@ void QgsAttributeEditorElement::setShowLabel( bool showLabel )
   mShowLabel = showLabel;
 }
 
-QVariantMap QgsAttributeEditorElement::config() const
+QVariantMap QgsAttributeEditorRelation::relationEditorConfiguration() const
 {
-  return mConfig;
+  return mRelationEditorConfig;
 }
 
-void QgsAttributeEditorElement::setConfig( const QVariantMap &config )
+void QgsAttributeEditorRelation::setRelationEditorConfiguration( const QVariantMap &config )
 {
-  mConfig = config;
+  mRelationEditorConfig = config;
+}
+
+QVariantMap QgsAttributeEditorRelation::specificConfiguration( ) const
+{
+  QVariantMap configuration;
+  configuration[QStringLiteral( "relation" ) ] = mRelation.id() ;
+  configuration[QStringLiteral( "forceSuppressFormPopup" )] = mForceSuppressFormPopup ;
+  configuration[QStringLiteral( "nmRelationId" )] = mNmRelationId.toString() ;
+  configuration[QStringLiteral( "label" )] = mLabel ;
+  configuration[QStringLiteral( "relationWidgetTypeId" )] = mRelationWidgetTypeId ;
+  return configuration;
 }
 
 void QgsAttributeEditorRelation::saveConfiguration( QDomElement &elem ) const
 {
   elem.setAttribute( QStringLiteral( "relation" ), mRelation.id() );
-  elem.setAttribute( QStringLiteral( "buttons" ), mConfig.value( QStringLiteral( "buttons" ) ).toString() );
+  elem.setAttribute( QStringLiteral( "buttons" ), mRelationEditorConfig.value( QStringLiteral( "buttons" ) ).toString() );
   elem.setAttribute( QStringLiteral( "forceSuppressFormPopup" ), mForceSuppressFormPopup );
   elem.setAttribute( QStringLiteral( "nmRelationId" ), mNmRelationId.toString() );
   elem.setAttribute( QStringLiteral( "label" ), mLabel );
-  elem.setAttribute( QStringLiteral( "relationWidgetTypeId" ), mRelationWidgetTypeId );
 }
 
 QString QgsAttributeEditorRelation::typeIdentifier() const
@@ -270,6 +310,13 @@ void QgsAttributeEditorQmlElement::setQmlCode( const QString &qmlCode )
   mQmlCode = qmlCode;
 }
 
+QVariantMap QgsAttributeEditorQmlElement::specificConfiguration( ) const
+{
+  QVariantMap configuration;
+  configuration[QStringLiteral( "qml_code" )] = mQmlCode;
+  return configuration;
+}
+
 void QgsAttributeEditorQmlElement::saveConfiguration( QDomElement &elem ) const
 {
   QDomText codeElem = elem.ownerDocument().createTextNode( mQmlCode );
@@ -297,6 +344,13 @@ QString QgsAttributeEditorHtmlElement::htmlCode() const
 void QgsAttributeEditorHtmlElement::setHtmlCode( const QString &htmlCode )
 {
   mHtmlCode = htmlCode;
+}
+
+QVariantMap QgsAttributeEditorHtmlElement::specificConfiguration( ) const
+{
+  QVariantMap configuration;
+  configuration[QStringLiteral( "html_code" )] = mHtmlCode;
+  return configuration;
 }
 
 void QgsAttributeEditorHtmlElement::saveConfiguration( QDomElement &elem ) const
