@@ -111,8 +111,8 @@ QVariantMap QgsAttributeEditorContainer::elementConfiguration() const
 {
   QVariantMap configuration;
   configuration[QStringLiteral( "columnCount" )] = mColumnCount;
-  configuration[QStringLiteral( "groupBox" ) ] = mIsGroupBox ? 1 : 0;
-  configuration[QStringLiteral( "visibilityExpressionEnabled" ) ] = mVisibilityExpression.enabled() ? 1 : 0;
+  configuration[QStringLiteral( "groupBox" ) ] = mIsGroupBox;
+  configuration[QStringLiteral( "visibilityExpressionEnabled" ) ] = mVisibilityExpression.enabled();
   configuration[QStringLiteral( "visibilityExpression" ) ] = mVisibilityExpression->expression();
   if ( mBackgroundColor.isValid() )
     configuration[QStringLiteral( "backgroundColor" ) ] = mBackgroundColor.name( );
