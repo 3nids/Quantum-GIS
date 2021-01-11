@@ -159,7 +159,7 @@ class CORE_EXPORT QgsAttributeEditorElement SIP_ABSTRACT
      *
      * \since QGIS 3.18
      */
-    virtual QVariantMap specificConfiguration() const = 0;
+    virtual QVariantMap elementConfiguration() const = 0;
 
     /**
      * Should be implemented by subclasses to save type specific configuration.
@@ -302,7 +302,7 @@ class CORE_EXPORT QgsAttributeEditorContainer : public QgsAttributeEditorElement
     void setBackgroundColor( const QColor &backgroundColor );
 
   private:
-    QVariantMap specificConfiguration() const override;
+    QVariantMap elementConfiguration() const override;
     Q_DECL_DEPRECATED void saveConfiguration( QDomElement &elem ) const override;
     QString typeIdentifier() const override;
 
@@ -341,7 +341,7 @@ class CORE_EXPORT QgsAttributeEditorField : public QgsAttributeEditorElement
     QgsAttributeEditorElement *clone( QgsAttributeEditorElement *parent ) const override SIP_FACTORY;
 
   private:
-    QVariantMap specificConfiguration() const override;
+    QVariantMap elementConfiguration() const override;
     Q_DECL_DEPRECATED void saveConfiguration( QDomElement &elem ) const override;
     QString typeIdentifier() const override;
     int mIdx;
@@ -500,7 +500,7 @@ class CORE_EXPORT QgsAttributeEditorRelation : public QgsAttributeEditorElement
     void setRelationEditorConfiguration( const QVariantMap &config );
 
   private:
-    QVariantMap specificConfiguration() const override;
+    QVariantMap elementConfiguration() const override;
     Q_DECL_DEPRECATED void saveConfiguration( QDomElement &elem ) const override;
     QString typeIdentifier() const override;
     QString mRelationId;
@@ -551,7 +551,7 @@ class CORE_EXPORT QgsAttributeEditorQmlElement : public QgsAttributeEditorElemen
     void setQmlCode( const QString &qmlCode );
 
   private:
-    QVariantMap specificConfiguration( ) const override;
+    QVariantMap elementConfiguration( ) const override;
     Q_DECL_DEPRECATED void saveConfiguration( QDomElement &elem ) const override;
     QString typeIdentifier() const override;
     QString mQmlCode;
@@ -593,7 +593,7 @@ class CORE_EXPORT QgsAttributeEditorHtmlElement : public QgsAttributeEditorEleme
     void setHtmlCode( const QString &htmlCode );
 
   private:
-    QVariantMap specificConfiguration( ) const override;
+    QVariantMap elementConfiguration( ) const override;
     Q_DECL_DEPRECATED void saveConfiguration( QDomElement &elem ) const override;
     QString typeIdentifier() const override;
     QString mHtmlCode;

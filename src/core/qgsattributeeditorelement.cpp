@@ -107,7 +107,7 @@ QgsAttributeEditorElement *QgsAttributeEditorContainer::clone( QgsAttributeEdito
   return element;
 }
 
-QVariantMap QgsAttributeEditorContainer::specificConfiguration() const
+QVariantMap QgsAttributeEditorContainer::elementConfiguration() const
 {
   QVariantMap configuration;
   configuration[QStringLiteral( "columnCount" )] = mColumnCount;
@@ -172,7 +172,7 @@ QgsAttributeEditorElement *QgsAttributeEditorRelation::clone( QgsAttributeEditor
 
   return element;
 }
-QVariantMap QgsAttributeEditorField::specificConfiguration( ) const
+QVariantMap QgsAttributeEditorField::elementConfiguration( ) const
 {
   QVariantMap configuration;
   configuration[QStringLiteral( "index" )] = mIdx;
@@ -203,7 +203,7 @@ QVariantMap QgsAttributeEditorElement::configuration( ) const
   QVariantMap configuration;
   configuration[ QStringLiteral( "name" )] = mName ;
   configuration[ QStringLiteral( "showLabel" )] = mShowLabel ;
-  configuration[ QStringLiteral( "configuration" )] = specificConfiguration();
+  configuration[ QStringLiteral( "configuration" )] = elementConfiguration();
   return configuration;
 }
 
@@ -227,7 +227,7 @@ void QgsAttributeEditorRelation::setRelationEditorConfiguration( const QVariantM
   mRelationEditorConfig = config;
 }
 
-QVariantMap QgsAttributeEditorRelation::specificConfiguration( ) const
+QVariantMap QgsAttributeEditorRelation::elementConfiguration( ) const
 {
   QVariantMap configuration;
   configuration[QStringLiteral( "relation" ) ] = mRelation.id() ;
@@ -310,7 +310,7 @@ void QgsAttributeEditorQmlElement::setQmlCode( const QString &qmlCode )
   mQmlCode = qmlCode;
 }
 
-QVariantMap QgsAttributeEditorQmlElement::specificConfiguration( ) const
+QVariantMap QgsAttributeEditorQmlElement::elementConfiguration( ) const
 {
   QVariantMap configuration;
   configuration[QStringLiteral( "qml_code" )] = mQmlCode;
@@ -346,7 +346,7 @@ void QgsAttributeEditorHtmlElement::setHtmlCode( const QString &htmlCode )
   mHtmlCode = htmlCode;
 }
 
-QVariantMap QgsAttributeEditorHtmlElement::specificConfiguration( ) const
+QVariantMap QgsAttributeEditorHtmlElement::elementConfiguration( ) const
 {
   QVariantMap configuration;
   configuration[QStringLiteral( "html_code" )] = mHtmlCode;
