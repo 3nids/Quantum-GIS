@@ -105,6 +105,13 @@ Returns the configuration as a variant map
 .. versionadded:: 3.18
 %End
 
+    static QgsAttributeEditorElement *create( const QVariantMap &configuration, const QString &layerId, const QgsFields &fields, QgsReadWriteContext &context, QgsAttributeEditorElement *parent = 0 ) /Factory/;
+%Docstring
+Returns the configured attribute editor implementation from the element
+
+.. versionadded:: 3.18
+%End
+
     virtual QgsAttributeEditorElement *clone( QgsAttributeEditorElement *parent ) const = 0 /Factory/;
 %Docstring
 Returns a clone of this element. To be implemented by subclasses.
@@ -341,7 +348,6 @@ Creates a new element which embeds a relation.
 :param relation: The relation to embed
 :param parent: The parent (used as container)
 %End
-
 
     const QgsRelation &relation() const;
 %Docstring

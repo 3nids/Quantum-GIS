@@ -125,6 +125,13 @@ class CORE_EXPORT QgsAttributeEditorElement SIP_ABSTRACT
     QVariantMap configuration() const;
 
     /**
+     * Returns the configured attribute editor implementation from the element
+     *
+     * \since QGIS 3.18
+     */
+    static QgsAttributeEditorElement *create( const QVariantMap &configuration, const QString &layerId, const QgsFields &fields, QgsReadWriteContext &context, QgsAttributeEditorElement *parent = nullptr ) SIP_FACTORY;
+
+    /**
      * Returns a clone of this element. To be implemented by subclasses.
      *
      * \since QGIS 3.0
@@ -160,6 +167,12 @@ class CORE_EXPORT QgsAttributeEditorElement SIP_ABSTRACT
      * \since QGIS 3.18
      */
     virtual QVariantMap elementConfiguration() const = 0;
+
+    /**
+     * Configures the attribute editor using the given config
+     * \ since QGIS 3.18
+     */ // TODO QGIS 4 make it pure virtual
+    virtual void loadElementConfiguration( const QVariantMap &config, const QString &layerId, QgsReadWriteContext &context, const QgsFields &fields );
 
     /**
      * Should be implemented by subclasses to save type specific configuration.
@@ -304,6 +317,7 @@ class CORE_EXPORT QgsAttributeEditorContainer : public QgsAttributeEditorElement
   private:
     QVariantMap elementConfiguration() const override;
     Q_DECL_DEPRECATED void saveConfiguration( QDomElement &elem ) const override;
+    void loadElementConfiguration( const QVariantMap &config, const QString &layerId, QgsReadWriteContext &context, const QgsFields &fields ) override;
     QString typeIdentifier() const override;
 
     bool mIsGroupBox;
@@ -311,6 +325,8 @@ class CORE_EXPORT QgsAttributeEditorContainer : public QgsAttributeEditorElement
     int mColumnCount;
     QgsOptionalExpression mVisibilityExpression;
     QColor mBackgroundColor;
+
+    friend class QgsEditFormConfig; // so that it can loadElementConfiguration
 };
 
 /**
@@ -343,6 +359,7 @@ class CORE_EXPORT QgsAttributeEditorField : public QgsAttributeEditorElement
   private:
     QVariantMap elementConfiguration() const override;
     Q_DECL_DEPRECATED void saveConfiguration( QDomElement &elem ) const override;
+    void loadElementConfiguration( const QVariantMap &config, const QString &layerId, QgsReadWriteContext &context, const QgsFields &fields ) override;
     QString typeIdentifier() const override;
     int mIdx;
 };
@@ -414,7 +431,6 @@ class CORE_EXPORT QgsAttributeEditorRelation : public QgsAttributeEditorElement
       , mRelationId( relation.id() )
       , mRelation( relation )
     {}
-
 
     /**
      * Gets the id of the relation which shall be embedded
@@ -502,6 +518,7 @@ class CORE_EXPORT QgsAttributeEditorRelation : public QgsAttributeEditorElement
   private:
     QVariantMap elementConfiguration() const override;
     Q_DECL_DEPRECATED void saveConfiguration( QDomElement &elem ) const override;
+    void loadElementConfiguration( const QVariantMap &config, const QString &layerId, QgsReadWriteContext &context, const QgsFields &fields ) override;
     QString typeIdentifier() const override;
     QString mRelationId;
     QgsRelation mRelation;
@@ -553,6 +570,7 @@ class CORE_EXPORT QgsAttributeEditorQmlElement : public QgsAttributeEditorElemen
   private:
     QVariantMap elementConfiguration( ) const override;
     Q_DECL_DEPRECATED void saveConfiguration( QDomElement &elem ) const override;
+    void loadElementConfiguration( const QVariantMap &config, const QString &layerId, QgsReadWriteContext &context, const QgsFields &fields ) override;
     QString typeIdentifier() const override;
     QString mQmlCode;
 };
@@ -595,6 +613,7 @@ class CORE_EXPORT QgsAttributeEditorHtmlElement : public QgsAttributeEditorEleme
   private:
     QVariantMap elementConfiguration( ) const override;
     Q_DECL_DEPRECATED void saveConfiguration( QDomElement &elem ) const override;
+    void loadElementConfiguration( const QVariantMap &config, const QString &layerId, QgsReadWriteContext &context, const QgsFields &fields ) override;
     QString typeIdentifier() const override;
     QString mHtmlCode;
 };

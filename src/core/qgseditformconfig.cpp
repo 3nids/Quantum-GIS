@@ -466,23 +466,42 @@ void QgsEditFormConfig::readXml( const QDomNode &node, QgsReadWriteContext &cont
   QDomNode attributeEditorFormNode = node.namedItem( QStringLiteral( "attributeEditorForm" ) );
   if ( !attributeEditorFormNode.isNull() )
   {
-    QDomNodeList attributeEditorFormNodeList = attributeEditorFormNode.toElement().childNodes();
+    const QString layerId = node.namedItem( QStringLiteral( "id" ) ).toElement().text();
 
-    if ( attributeEditorFormNodeList.size() )
+    QVariant config = QgsXmlUtils::readVariant( attributeEditorFormNode.toElement().firstChildElement( QStringLiteral( "Option" ) ) );
+    if ( config.type() == QVariant::Map )
     {
-      d->mConfiguredRootContainer = true;
-      clearTabs();
-
-      for ( int i = 0; i < attributeEditorFormNodeList.size(); i++ )
+      QgsAttributeEditorContainer *element = new QgsAttributeEditorContainer( QString(), nullptr );
+      element->loadElementConfiguration( config.toMap(), layerId, context, d->mFields );
+      const QList<QgsAttributeEditorElement *> children = element->children();
+      for ( QgsAttributeEditorElement *child : children )
       {
-        QDomElement elem = attributeEditorFormNodeList.at( i ).toElement();
-
-        QgsAttributeEditorElement *attributeEditorWidget = attributeEditorElementFromDomElement( elem, nullptr, node.namedItem( QStringLiteral( "id" ) ).toElement().text(), context );
-        if ( attributeEditorWidget )
-          addTab( attributeEditorWidget );
+        addTab( child );
       }
 
       onRelationsLoaded();
+    }
+    else
+    {
+      // load legacy format
+      QDomNodeList attributeEditorFormNodeList = attributeEditorFormNode.toElement().childNodes();
+
+      if ( attributeEditorFormNodeList.size() )
+      {
+        d->mConfiguredRootContainer = true;
+        clearTabs();
+
+        for ( int i = 0; i < attributeEditorFormNodeList.size(); i++ )
+        {
+          QDomElement elem = attributeEditorFormNodeList.at( i ).toElement();
+
+          QgsAttributeEditorElement *attributeEditorWidget = attributeEditorElementFromDomElement( elem, nullptr, layerId, context );
+          if ( attributeEditorWidget )
+            addTab( attributeEditorWidget );
+        }
+
+        onRelationsLoaded();
+      }
     }
   }
 }
@@ -617,6 +636,10 @@ void QgsEditFormConfig::writeXml( QDomNode &node, const QgsReadWriteContext &con
 
 QgsAttributeEditorElement *QgsEditFormConfig::attributeEditorElementFromDomElement( QDomElement &elem, QgsAttributeEditorElement *parent, const QString &layerId, const QgsReadWriteContext &context )
 {
+  // ----
+  // this method is for compatibility loading of project up to QGIS 3.16
+  // look at QgsAttributeEditorElement::create and loadElementConfiguration implementations in subclasses
+  // -----
   QgsAttributeEditorElement *newElement = nullptr;
 
   if ( elem.tagName() == QLatin1String( "attributeEditorContainer" ) )
@@ -668,31 +691,28 @@ QgsAttributeEditorElement *QgsEditFormConfig::attributeEditorElementFromDomEleme
     // At this time, the relations are not loaded
     // So we only grab the id and delegate the rest to onRelationsLoaded()
     QgsAttributeEditorRelation *relElement = new QgsAttributeEditorRelation( elem.attribute( QStringLiteral( "relation" ), QStringLiteral( "[None]" ) ), parent );
-    QVariantMap config = QgsXmlUtils::readVariant( elem.firstChildElement( "config" ) ).toMap();
 
-    // load defaults
-    if ( config.isEmpty() )
-      config = relElement->relationEditorConfiguration();
+    // ----
+    // this method is for compatibility loading of project up to QGIS 3.16
+    // look at QgsAttributeEditorElement::create and loadElementConfiguration implementations in subclasses
+    // -----
 
-    // pre QGIS 3.18 compatibility
-    if ( ! config.contains( QStringLiteral( "buttons" ) ) )
+    // 3.16 projects
+    QVariantMap config;
+    if ( elem.hasAttribute( "buttons" ) )
     {
-      if ( elem.hasAttribute( "buttons" ) )
-      {
-        QString buttonString = elem.attribute( QStringLiteral( "buttons" ), qgsFlagValueToKeys( QgsAttributeEditorRelation::Button::AllButtons ) );
-        config.insert( "buttons", qgsFlagValueToKeys( qgsFlagKeysToValue( buttonString, QgsAttributeEditorRelation::Button::AllButtons ) ) );
-      }
-      else
-      {
-        // pre QGIS 3.16 compatibility
-        QgsAttributeEditorRelation::Buttons buttons = QgsAttributeEditorRelation::Button::AllButtons;
-        buttons.setFlag( QgsAttributeEditorRelation::Button::Link, elem.attribute( QStringLiteral( "showLinkButton" ), QStringLiteral( "1" ) ).toInt() );
-        buttons.setFlag( QgsAttributeEditorRelation::Button::Unlink, elem.attribute( QStringLiteral( "showUnlinkButton" ), QStringLiteral( "1" ) ).toInt() );
-        buttons.setFlag( QgsAttributeEditorRelation::Button::SaveChildEdits, elem.attribute( QStringLiteral( "showSaveChildEditsButton" ), QStringLiteral( "1" ) ).toInt() );
-        config.insert( "buttons", qgsFlagValueToKeys( buttons ) );
-      }
+      QString buttonString = elem.attribute( QStringLiteral( "buttons" ), qgsFlagValueToKeys( QgsAttributeEditorRelation::Button::AllButtons ) );
+      config.insert( "buttons", qgsFlagValueToKeys( qgsFlagKeysToValue( buttonString, QgsAttributeEditorRelation::Button::AllButtons ) ) );
     }
-
+    else
+    {
+      // pre QGIS 3.16 compatibility
+      QgsAttributeEditorRelation::Buttons buttons = QgsAttributeEditorRelation::Button::AllButtons;
+      buttons.setFlag( QgsAttributeEditorRelation::Button::Link, elem.attribute( QStringLiteral( "showLinkButton" ), QStringLiteral( "1" ) ).toInt() );
+      buttons.setFlag( QgsAttributeEditorRelation::Button::Unlink, elem.attribute( QStringLiteral( "showUnlinkButton" ), QStringLiteral( "1" ) ).toInt() );
+      buttons.setFlag( QgsAttributeEditorRelation::Button::SaveChildEdits, elem.attribute( QStringLiteral( "showSaveChildEditsButton" ), QStringLiteral( "1" ) ).toInt() );
+      config.insert( "buttons", qgsFlagValueToKeys( buttons ) );
+    }
     relElement->setRelationEditorConfiguration( config );
 
     if ( elem.hasAttribute( QStringLiteral( "forceSuppressFormPopup" ) ) )

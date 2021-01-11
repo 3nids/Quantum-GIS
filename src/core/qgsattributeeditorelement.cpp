@@ -142,6 +142,35 @@ void QgsAttributeEditorContainer::saveConfiguration( QDomElement &elem ) const
   }
 }
 
+void QgsAttributeEditorContainer::loadElementConfiguration( const QVariantMap &config, const QString &layerId, QgsReadWriteContext &context, const QgsFields &fields )
+{
+  mBackgroundColor = config.value( QStringLiteral( "backgroundColor" ), QColor() ).value<QColor>();
+  int cc = config.value( QStringLiteral( "columnCount" ), 1 ).toInt();
+  setColumnCount( cc );
+
+  if ( config.keys().contains( "groupBox" ) )
+  {
+    bool isGroupBox = config.value( QStringLiteral( "groupBox" ) ).toBool();
+    setIsGroupBox( isGroupBox );
+  }
+  else
+  {
+    setIsGroupBox( mParent );
+  }
+
+  QgsOptionalExpression visibilityExpression;
+  visibilityExpression.setEnabled( config.value( QStringLiteral( "visibilityExpressionEnabled" ), false ).toBool() );
+  visibilityExpression.setData( QgsExpression( config.value( QStringLiteral( "visibilityExpression" ) ).toString() ) );
+  setVisibilityExpression( visibilityExpression );
+
+  const QVariantList children = config.value( QStringLiteral( "children" ) ).toList();
+  for ( const QVariant &child : children )
+  {
+    QgsAttributeEditorElement *elem = QgsAttributeEditorElement::create( child.toMap(), layerId, fields, context, mParent );
+    addChildElement( elem );
+  }
+}
+
 QString QgsAttributeEditorContainer::typeIdentifier() const
 {
   return QStringLiteral( "attributeEditorContainer" );
@@ -169,6 +198,7 @@ QgsAttributeEditorElement *QgsAttributeEditorRelation::clone( QgsAttributeEditor
   element->mForceSuppressFormPopup = mForceSuppressFormPopup;
   element->mNmRelationId = mNmRelationId;
   element->mLabel = mLabel;
+  element->mRelationEditorConfig = mRelationEditorConfig;
 
   return element;
 }
@@ -182,6 +212,14 @@ QVariantMap QgsAttributeEditorField::elementConfiguration( ) const
 void QgsAttributeEditorField::saveConfiguration( QDomElement &elem ) const
 {
   elem.setAttribute( QStringLiteral( "index" ), mIdx );
+}
+
+void QgsAttributeEditorField::loadElementConfiguration( const QVariantMap &config, const QString &layerId, QgsReadWriteContext &context, const QgsFields &fields )
+{
+  Q_UNUSED( config )
+  Q_UNUSED( layerId )
+  Q_UNUSED( context )
+  Q_UNUSED( fields )
 }
 
 QString QgsAttributeEditorField::typeIdentifier() const
@@ -201,10 +239,55 @@ QDomElement QgsAttributeEditorElement::toDomElement( QDomDocument &doc ) const
 QVariantMap QgsAttributeEditorElement::configuration( ) const
 {
   QVariantMap configuration;
+  configuration[ QStringLiteral( "type" )] = typeIdentifier() ;
   configuration[ QStringLiteral( "name" )] = mName ;
   configuration[ QStringLiteral( "showLabel" )] = mShowLabel ;
   configuration[ QStringLiteral( "configuration" )] = elementConfiguration();
   return configuration;
+}
+
+QgsAttributeEditorElement *QgsAttributeEditorElement::create( const QVariantMap &configuration,
+    const QString &layerId,
+    const QgsFields &fields,
+    QgsReadWriteContext &context,
+    QgsAttributeEditorElement *parent )
+{
+  QgsAttributeEditorElement *newElement = nullptr;
+
+  QString elementType = configuration["type"].toString();
+  QString name = configuration["name"].toString();
+
+  if ( elementType == QLatin1String( "attributeEditorContainer" ) )
+  {
+    newElement = new QgsAttributeEditorContainer( context.projectTranslator()->translate( QStringLiteral( "project:layers:%1:formcontainers" ).arg( layerId ), name ), parent );
+  }
+  else if ( elementType == QLatin1String( "attributeEditorField" ) )
+  {
+    int idx = fields.lookupField( name );
+    newElement = new QgsAttributeEditorField( name, idx, parent );
+  }
+  else if ( elementType == QLatin1String( "attributeEditorRelation" ) )
+  {
+    // At this time, the relations are not loaded
+    // So we only grab the id and delegate the rest to init()
+    newElement = new QgsAttributeEditorRelation( QString(), parent );
+  }
+  else if ( elementType == QLatin1String( "attributeEditorQmlElement" ) )
+  {
+    newElement = new QgsAttributeEditorQmlElement( name, parent );
+  }
+  else if ( elementType == QLatin1String( "attributeEditorHtmlElement" ) )
+  {
+    newElement = new QgsAttributeEditorHtmlElement( name, parent );
+  }
+
+  if ( newElement )
+  {
+    newElement->setShowLabel( configuration.value( QStringLiteral( "showLabel" ), true ).toBool() );
+    newElement->loadElementConfiguration( configuration, layerId, context, fields );
+  }
+
+  return newElement;
 }
 
 bool QgsAttributeEditorElement::showLabel() const
@@ -215,6 +298,16 @@ bool QgsAttributeEditorElement::showLabel() const
 void QgsAttributeEditorElement::setShowLabel( bool showLabel )
 {
   mShowLabel = showLabel;
+}
+
+void QgsAttributeEditorElement::loadElementConfiguration( const QVariantMap &config, const QString &layerId, QgsReadWriteContext &context, const QgsFields &fields )
+{
+  // TODO QGIS 4: make it pure virtual
+  // do not write code here, put anything into static method create
+  Q_UNUSED( config )
+  Q_UNUSED( layerId )
+  Q_UNUSED( context )
+  Q_UNUSED( fields )
 }
 
 QVariantMap QgsAttributeEditorRelation::relationEditorConfiguration() const
@@ -235,6 +328,7 @@ QVariantMap QgsAttributeEditorRelation::elementConfiguration( ) const
   configuration[QStringLiteral( "nmRelationId" )] = mNmRelationId.toString() ;
   configuration[QStringLiteral( "label" )] = mLabel ;
   configuration[QStringLiteral( "relationWidgetTypeId" )] = mRelationWidgetTypeId ;
+  configuration[QStringLiteral( "relationEditorConfiguration" ) ] = mRelationEditorConfig;
   return configuration;
 }
 
@@ -292,6 +386,19 @@ void QgsAttributeEditorRelation::setRelationWidgetTypeId( const QString &relatio
   mRelationWidgetTypeId = relationWidgetTypeId;
 }
 
+void QgsAttributeEditorRelation::loadElementConfiguration( const QVariantMap &config, const QString &layerId, QgsReadWriteContext &context, const QgsFields &fields )
+{
+  Q_UNUSED( layerId )
+  Q_UNUSED( context )
+  Q_UNUSED( fields )
+  mRelationId = config.value( QStringLiteral( "relation" ), QStringLiteral( "[None]" ) ).toString();
+  mRelationEditorConfig = config.value( QStringLiteral( "relationEditorConfiguration" ) ).toMap();
+  mForceSuppressFormPopup = config.value( QStringLiteral( "forceSuppressFormPopup" ) ).toBool();
+  mNmRelationId = config.value( QStringLiteral( "nmRelationId" ) ).toString();
+  mLabel = config.value( QStringLiteral( "label" ) ).toString();
+  mRelationWidgetTypeId = config.value( QStringLiteral( "relationWidgetTypeId" ) ).toString();
+}
+
 QgsAttributeEditorElement *QgsAttributeEditorQmlElement::clone( QgsAttributeEditorElement *parent ) const
 {
   QgsAttributeEditorQmlElement *element = new QgsAttributeEditorQmlElement( name(), parent );
@@ -321,6 +428,15 @@ void QgsAttributeEditorQmlElement::saveConfiguration( QDomElement &elem ) const
 {
   QDomText codeElem = elem.ownerDocument().createTextNode( mQmlCode );
   elem.appendChild( codeElem );
+}
+
+void QgsAttributeEditorQmlElement::loadElementConfiguration( const QVariantMap &config, const QString &layerId, QgsReadWriteContext &context, const QgsFields &fields )
+{
+  Q_UNUSED( config )
+  Q_UNUSED( layerId )
+  Q_UNUSED( context )
+  Q_UNUSED( fields )
+  mQmlCode = config.value( QStringLiteral( "qml_code" ) ).toString();
 }
 
 QString QgsAttributeEditorQmlElement::typeIdentifier() const
@@ -359,8 +475,16 @@ void QgsAttributeEditorHtmlElement::saveConfiguration( QDomElement &elem ) const
   elem.appendChild( codeElem );
 }
 
+void QgsAttributeEditorHtmlElement::loadElementConfiguration( const QVariantMap &config, const QString &layerId, QgsReadWriteContext &context, const QgsFields &fields )
+{
+  Q_UNUSED( config )
+  Q_UNUSED( layerId )
+  Q_UNUSED( context )
+  Q_UNUSED( fields )
+  mHtmlCode = config.value( QStringLiteral( "html_code" ) ).toString();
+}
+
 QString QgsAttributeEditorHtmlElement::typeIdentifier() const
 {
   return QStringLiteral( "attributeEditorHtmlElement" );
 }
-
