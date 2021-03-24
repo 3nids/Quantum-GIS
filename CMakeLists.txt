@@ -440,7 +440,7 @@ if(WITH_CORE)
     set(QT_VERSION_BASE "Qt6")
   else()
     set(QT_MIN_VERSION 5.12.0)
-    set(QT_VERSION_BASE "Qt5")    
+    set(QT_VERSION_BASE "Qt5")
   endif()
 
   # Use Qt5SerialPort optionally for GPS
@@ -942,6 +942,11 @@ find_package(Python ${MIN_PYTHON_VERSION} REQUIRED COMPONENTS Interpreter Develo
 message("-- Found Python executable: ${Python_EXECUTABLE} (version ${Python_VERSION})")
 message("-- Python library: ${Python_LIBRARIES}")
 message("-- Python site-packages: ${Python_SITEARCH}")
+
+set (WITH_PYSIDE FALSE CACHE BOOL "Enable (broken, experimental) PySide support")
+if (WITH_PYSIDE)
+  add_subdirector(qt-for-python)
+endif()
 
 if (WITH_CORE AND WITH_BINDINGS AND NOT WITH_QT6)
   # python support: check for interpreter, sip, pyqt5
