@@ -2992,7 +2992,8 @@ void QgsSymbolLayerUtils::saveProperties( QVariantMap props, QDomDocument &doc, 
 
   // -----
   // let's do this to try to keep some backward compatibility
-  // to open a project saved on 3.18+ in QGIS <= 3.16
+  // to open this project on an old QGIS <= 3.16
+  // TOOO QGIS 3.22: remove?
   // TODO QGIS 4: remove
   for ( QVariantMap::iterator it = props.begin(); it != props.end(); ++it )
   {
